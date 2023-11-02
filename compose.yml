@@ -1,6 +1,8 @@
 services:
   dash-prod:
     build: .
+    environment:
+      - BIND_IP=0.0.0.0
     ports:
       - "8080:8000"
       - "80:8000"

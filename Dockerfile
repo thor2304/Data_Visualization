@@ -15,4 +15,4 @@ CMD python3 src/Core/main.py
 FROM dev as prod
 RUN pip install gunicorn
 #WORKDIR src/Core
-CMD gunicorn -w 4 'Core.main:server'
+CMD gunicorn -w 4 'Core.main:server' --bind=$(BIND_IP)
