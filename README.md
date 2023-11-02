@@ -18,3 +18,15 @@ Dash documentation
 Pandas documentation
 - https://www.w3schools.com/python/pandas/default.asp
 - https://pandas.pydata.org/docs/user_guide/index.html
+
+
+# Running the app on prod
+Currently it is not entirely production complete since it does not run using a real production wsgi server.
+I dont care.
+
+Run the bastard using:
+```shell
+docker compose up
+```
+Boom badabing you got it running using port 8080. 
+If you want port 80 on the server uncomment it in the docker compose file.

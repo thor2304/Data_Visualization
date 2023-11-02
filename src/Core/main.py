@@ -9,6 +9,8 @@ TITLE = 'Data Visualizations incoming'
 
 app = Dash(__name__)
 
+server = app.server
+
 app.layout = html.Div([
     html.H1(children=TITLE, style={'textAlign': 'center'}),
     dcc.Dropdown(df.country.unique(), 'Canada', id='dropdown-selection'),
@@ -29,5 +31,9 @@ def update_graph(value: str) -> Figure:
     })
 
 
+def main():
+    app.run(debug=True, host="127.0.0.1", port=8070)
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    main()

@@ -1,0 +1,15 @@
+services:
+  dash-prod:
+    build: .
+    ports:
+      - "8080:8000"
+      - "80:8000"
+  dash-dev:
+    build:
+      context: .
+      target: dev
+    profiles: ["dev"]
+    ports:
+      - "8070:8070"
+
+
