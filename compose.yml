@@ -3,7 +3,7 @@ services:
     build: .
     environment:
       - BIND_IP=0.0.0.0
-      - fetch=True
+      - fetch=False
     ports:
       - "8080:8000"
       - "80:8000"
