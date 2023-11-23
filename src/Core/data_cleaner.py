@@ -80,7 +80,7 @@ def main():
         print(f"{key}: {column_contents[key]}")
 
     df = cap_column(df, "Vehicle Speed", 200)
-    df.to_csv("cleaned_output.csv", mode="w", encoding="utf8")
+    df.to_csv("data/cleaned_output.csv", mode="w", encoding="utf8")
 
 
 def cap_column(df, column_name, cap):

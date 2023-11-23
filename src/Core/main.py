@@ -13,9 +13,14 @@ print("fetch data")
 if os.environ["fetch"] == "True":
     df = pd.read_csv('http://datadump.cryptobot.dk/Major_Safety_Events.csv', low_memory=False)
 else:
-    df = pd.read_csv('src/Core/data/cleaned_output.csv')
+    filename = f"{__file__[:-7]}data/cleaned_output.csv"
+    df = pd.read_csv(filename)
+    # df.apply(lambda x: x['Event Date'].format(name=x['name']), axis=1)
+    df['Event Date'] = pd.to_datetime(df['Event Date'])
+    df['Event Time'] = pd.to_datetime(df['Event Time'])
 print("data fetched")
-print(df.columns[35])
+print(df.columns[12])
+print(df["Event Time"])
 
 
 TITLE = 'Data Visualizations incoming'
@@ -26,11 +31,34 @@ server = app.server
 
 app.layout = html.Div([
     html.H1(children=TITLE, style={'textAlign': 'center'}),
-    dcc.Dropdown(df.Agency.unique(), 'Metro Transit', id='dropdown-selection'),
-    dcc.Graph(id='graph-content', style={'width': '100%', 'height': '60em'}),
-    html.H1(children="Map of all accidents", style={'textAlign': 'center'}),
+    dcc.Dropdown(df["Rail/Bus/Ferry"].unique(), 'Bus', id='3d-dropdown-selection'),
+    dcc.Graph(id='3d-graph', style={'width': '100%', 'height': '80em'}),
+
+    dcc.Dropdown(df.Agency.unique(), 'Dallas Area Transit', id='dropdown-selection'),
+    dcc.Graph(id='graph-content'),
+    html.H2(children="Map of all accidents", style={'textAlign': 'center'}),
     dcc.Graph(id='accident-map', style={'width': '100%', 'height': '60em'}),
 ])
+
+
+@callback(
+    Output('3d-graph', 'figure'),
+    Input('3d-dropdown-selection', 'value')
+)
+def update_3d_plot(value: str) -> Figure:
+    category_data = df[df["Rail/Bus/Ferry"] == value]
+    marker_size = 3
+
+    fig = px.scatter_3d(category_data, x='Event Date', y='Event Time', z='Vehicle Speed', labels={
+        "Agency": "agency",
+        "Year": "years",
+    }, color="Total Serious Injuries")
+
+    fig.update_traces(marker=dict(
+        size=marker_size
+    ), selector=dict(mode="markers"))
+
+    return fig
 
 
 @callback(
@@ -39,7 +67,7 @@ app.layout = html.Div([
 )
 def update_graph(value: str) -> Figure:
     country_data = df[df.Agency == value]
-    return px.scatter(country_data, x='Year', y='Total Serious Injuries', labels={
+    return px.scatter(country_data, x='Event Date', y='Total Injuries', labels={
         "Agency": "agency",
         "Year": "years",
     })
