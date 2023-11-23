@@ -3,6 +3,7 @@ services:
     build: .
     environment:
       - BIND_IP=0.0.0.0
+      - fetch=False
     ports:
       - "8080:8000"
       - "80:8000"
@@ -10,6 +11,8 @@ services:
     build:
       context: .
       target: dev
+    environment:
+      - fetch=false
     profiles: ["dev"]
     ports:
       - "8070:8070"
