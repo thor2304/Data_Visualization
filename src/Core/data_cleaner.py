@@ -48,7 +48,7 @@ def main():
 
     df = pandas.read_csv('Major_Safety_Events.csv', low_memory=False)
 
-    column_indexes_to_drop = [20, 24, 39, 40, 43, 46, 47, 55]
+    column_indexes_to_drop = [20, 24, 35, 39, 40, 43, 46, 47, 55]
     column_names_to_drop = []
 
     for row in df.iterrows():
@@ -73,7 +73,6 @@ def main():
     # write_cleaned("Major_Safety_Events.csv")
     pass
 
-
     # print(column_contents)
     high_keys = filter(lambda x: x > 20, column_contents.keys())
 
@@ -83,9 +82,11 @@ def main():
     df = cap_column(df, "Vehicle Speed", 200)
     df.to_csv("cleaned_output.csv", mode="w", encoding="utf8")
 
+
 def cap_column(df, column_name, cap):
     df.loc[df[column_name] > cap, column_name] = cap
     return df
+
 
 if __name__ == '__main__':
     main()
