@@ -5,7 +5,7 @@ def write_cleaned(filepath: str):
     indexes = (0, 1)
 
     with open(filepath, 'r', encoding="utf8") as input_file:
-        with open("cleaned_output.csv", "w", encoding="utf8") as output_file:
+        with open("data/cleaned_output.csv", "w", encoding="utf8") as output_file:
             while True:
                 line = input_file.readline()
                 if not line:
@@ -46,7 +46,7 @@ def main():
 
     index = 33
 
-    df = pandas.read_csv('Major_Safety_Events.csv', low_memory=False)
+    df = pandas.read_csv('data/Major_Safety_Events.csv', low_memory=False)
 
     column_indexes_to_drop = [20, 24, 35, 39, 40, 43, 46, 47, 55]
     column_names_to_drop = []

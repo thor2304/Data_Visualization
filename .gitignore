@@ -160,5 +160,5 @@ cython_debug/
 .idea/
 /Major_Safety_Events.csv
 
-/src/Core/Major_Safety_Events.csv
-/src/Core/cleaned_output.csv
+/src/Core/data/Major_Safety_Events.csv
+/src/Core/data/cleaned_output.csv

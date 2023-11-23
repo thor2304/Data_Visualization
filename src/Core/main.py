@@ -13,9 +13,10 @@ print("fetch data")
 if os.environ["fetch"] == "True":
     df = pd.read_csv('http://datadump.cryptobot.dk/Major_Safety_Events.csv', low_memory=False)
 else:
-    df = pd.read_csv('src/Core/cleaned_output.csv')
+    df = pd.read_csv('src/Core/data/cleaned_output.csv')
 print("data fetched")
 print(df.columns[35])
+
 
 TITLE = 'Data Visualizations incoming'
 
