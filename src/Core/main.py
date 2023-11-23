@@ -49,10 +49,10 @@ def update_3d_plot(value: str) -> Figure:
     category_data = df[df["Rail/Bus/Ferry"] == value]
     marker_size = 3
 
-    fig = px.scatter_3d(category_data, x='Event Date', y='Event Time', z='Vehicle Speed', labels={
+    fig = px.scatter_3d(category_data, x='Event Date', y='Event Time', z='Total Injuries', labels={
         "Agency": "agency",
         "Year": "years",
-    }, color="Total Serious Injuries")
+    }, color="Total Injuries")
 
     fig.update_traces(marker=dict(
         size=marker_size
@@ -67,7 +67,7 @@ def update_3d_plot(value: str) -> Figure:
 )
 def update_graph(value: str) -> Figure:
     country_data = df[df.Agency == value]
-    return px.scatter(country_data, x='Event Date', y='Total Injuries', labels={
+    return px.scatter(country_data, x='Event Date', y='Total Serious Injuries', labels={
         "Agency": "agency",
         "Year": "years",
     })
