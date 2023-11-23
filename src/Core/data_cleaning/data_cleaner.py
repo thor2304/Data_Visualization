@@ -1,11 +1,12 @@
 import pandas
+import clean_counties
 
 
 def write_cleaned(filepath: str):
     indexes = (0, 1)
 
     with open(filepath, 'r', encoding="utf8") as input_file:
-        with open("data/cleaned_output.csv", "w", encoding="utf8") as output_file:
+        with open("../data/cleaned_output.csv", "w", encoding="utf8") as output_file:
             while True:
                 line = input_file.readline()
                 if not line:
@@ -46,7 +47,7 @@ def main():
 
     index = 33
 
-    df = pandas.read_csv('data/Major_Safety_Events.csv', low_memory=False)
+    df = pandas.read_csv('../data/Major_Safety_Events.csv', low_memory=False)
 
     column_indexes_to_drop = [20, 24, 35, 39, 40, 43, 46, 47, 55]
     column_names_to_drop = []
@@ -80,7 +81,7 @@ def main():
         print(f"{key}: {column_contents[key]}")
 
     df = cap_column(df, "Vehicle Speed", 200)
-    df.to_csv("data/cleaned_output.csv", mode="w", encoding="utf8")
+    df.to_csv("../data/cleaned_output.csv", mode="w", encoding="utf8")
 
 
 def cap_column(df, column_name, cap):
@@ -90,3 +91,4 @@ def cap_column(df, column_name, cap):
 
 if __name__ == '__main__':
     main()
+    clean_counties.clean_populations()
