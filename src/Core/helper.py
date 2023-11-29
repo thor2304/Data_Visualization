@@ -4,17 +4,19 @@ import pandas as pd
 # Rows are years
 # Columns are different event types
 def createQuestion2DataModel(df: pd.DataFrame):
-    print("yes")
-    print(df['Event Type Group'].value_counts())
-    print("no")
-    list_of_years = df['Year'].unique().tolist()
-    print(list_of_years)
-    list_of_years.sort()
-    print(list_of_years)
+    y_akse = pd.DataFrame()
 
+    temp_data = df['Event Type Group'].value_counts().sort_index()
 
-    # data = pd[dict(out["Assault"])]
-    # print(data)
+    print(temp_data)
+    # Delete row
+    temp_data.drop('Non-RGX Collision', inplace=True)
+    print(temp_data)
+
+    y_akse['Event Type Group'] = temp_data.values
+
+    x_akse = df['Event Type Group'].unique()
+    x_akse.sort()
 
 if __name__ == '__main__':
     filename = "data/cleaned_output.csv"
