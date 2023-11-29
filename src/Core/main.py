@@ -38,6 +38,10 @@ app.layout = html.Div([
     dcc.Graph(id='graph-content'),
     html.H2(children="Map of all accidents", style={'textAlign': 'center'}),
     dcc.Graph(id='accident-map', style={'width': '100%', 'height': '60em'}),
+
+    html.H2(children="Graph showing amount of events", style={'textAlign': 'center'}),
+    dcc.Dropdown(df['Event Type Group'].unique(), 'Collision', id='event-dropdown-selection'),
+    dcc.Graph(id='event-graph'),
 ])
 
 
@@ -72,6 +76,19 @@ def update_graph(value: str) -> Figure:
         "Year": "years",
     })
 
+@callback(
+    Output('event-graph', 'figure'),
+    Input('event-dropdown-selection', 'value')
+)
+def update_event_graph(value: str) -> Figure:
+    country_data = df[df['Event Type Group'] == value]
+    s = df['Event Type Group'].value_counts()
+    print(s)
+    return px.scatter(country_data, x='Years', y=s.values, labels={
+        s.values: "amount",
+        "Year": "years",
+    })
+
 
 @callback(
     Output('accident-map', 'figure'),
@@ -86,8 +103,10 @@ def update_map(value: str) -> Figure:
 
 
 def main():
-    print(df)
-    print(df.columns)
+    # print(df)
+    # print(df.columns)
+    s = df['Event Type Group'].value_counts()
+    print(s)
     # print(us.from_coords(36.6062, -98.3321)[0])
     app.run(debug=True, host="127.0.0.1", port=8070)
 
