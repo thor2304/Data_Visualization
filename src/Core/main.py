@@ -25,7 +25,7 @@ print(df["Event Time"])
 
 TITLE = 'Data Visualizations incoming'
 
-app = Dash(__name__, use_pages=True)
+app = Dash(__name__)
 
 server = app.server
 
@@ -34,14 +34,6 @@ eventsListRaw = df["Event Type Group"].unique()
 eventsList = np.delete(eventsListRaw, np.where(eventsListRaw == "Non-RGX Collision"))
 
 app.layout = html.Div([
-html.H1('Multi-page app with Dash Pages'),
-html.Div([
-        html.Div(
-            dcc.Link(f"{page['name']} - {page['path']}", href=page["relative_path"])
-        ) for page in dash.page_registry.values()
-    ]),
-        dash.page_container
-
     # html.H1(children=TITLE, style={'textAlign': 'center'}),
     # dcc.Dropdown(df["Rail/Bus/Ferry"].unique(), 'Bus', id='3d-dropdown-selection'),
     # dcc.Graph(id='3d-graph', style={'width': '100%', 'height': '80em'}),
@@ -51,9 +43,9 @@ html.Div([
     # html.H2(children="Map of all accidents", style={'textAlign': 'center'}),
     # dcc.Graph(id='accident-map', style={'width': '100%', 'height': '60em'}),
 
-    # html.H2(children="Graph showing amount of events", style={'textAlign': 'center'}),
-    # dcc.Dropdown(eventsList, 'Collision', id='event-dropdown-selection'),
-    # dcc.Graph(id='event-graph'),
+    html.H2(children="Graph showing amount of events", style={'textAlign': 'center'}),
+    dcc.Dropdown(eventsList, 'Collision', id='event-dropdown-selection'),
+    dcc.Graph(id='event-graph'),
 ])
 
 
@@ -93,37 +85,17 @@ html.Div([
     Input('event-dropdown-selection', 'value')
 )
 def update_event_graph(value: str) -> Figure:
-    ## Get all event types except for Non-RGX Collision
-    oldList = df['Event Type Group'].unique()
-    eventTypes = oldList.tolist()
-    eventTypes.remove("Non-RGX Collision")
 
-    ## Create list from year column
-    testDf = df['Year'].unique()
-    p = testDf.tolist()
+    y_akse = pd.DataFrame()
 
-    ## Sort list in ascending order
-    p.sort()
+    temp_data = df['Event Type Group'].value_counts().sort_index()
 
-    ## Create new dataframe to store data
-    out = pd.DataFrame()
+    y_akse['Event Type Group'] = temp_data.values
 
-    ## Add year column from original data starting from lowest year to highest
-    out['Year'] = p
-    print(out)
+    x_akse = df['Event Type Group'].unique()
+    x_akse.sort()
 
-    ## Calculate number of events per year one event type
-    counts = df[df['Event Type Group'] == value]['Year'].value_counts()
-    counts.sort_index(inplace=True, ascending=True)
-    print(counts)
-
-    ## Add event type column to new dataframe
-    out[value] = counts.values
-    print(out)
-
-    return px.line(out, x='Year', y=value, markers=True, labels={
-        value: "Amount of events",
-        "Year": "Years",
+    return px.bar(x=x_akse, y=y_akse['Event Type Group'], labels={
     })
 
 
@@ -138,12 +110,8 @@ def update_event_graph(value: str) -> Figure:
 #                              center=dict(lat=36.6062, lon=-98.3321), zoom=4,
 #                              mapbox_style="open-street-map")
 
-
 def main():
     app.run(debug=True, host="127.0.0.1", port=8070)
-
-
-
 
 if __name__ == '__main__':
     main()
