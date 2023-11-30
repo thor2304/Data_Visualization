@@ -45,6 +45,8 @@ app.layout = html.Div([
             # TITLE
             html.H1(children=TITLE, style={'textAlign': 'center'}),
             html.Br(),
+            # Link
+            html.A("Link to slides", href="https://docs.google.com/presentation/d/1fhCPoXRcuAyMtLtjcIDdk0Hj8GH-Az2udhRZHSXvx28/edit?usp=sharing", target="_blank"),
 
             # 3D GRAPH
             html.H2(children=Questions.get("1"), style={'textAlign': 'center'}),
