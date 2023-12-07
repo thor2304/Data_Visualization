@@ -6,11 +6,21 @@ app = Dash(__name__, use_pages=True, external_stylesheets=[dbc.themes.BOOTSTRAP]
 
 server = app.server
 
+navbarChildren = [
+    dbc.NavItem(dbc.NavLink(page['name'], id=page["name"], href=page["relative_path"])) for page
+    in dash.page_registry.values()
+]
+navbarChildren.append(dbc.NavItem(
+    dbc.Button(
+        "Download Report",
+        href="/static/group-11-report-DV.pdf",
+        download="group-11-report-DV.pdf",
+        external_link=True,
+        color="dark",
+    )))
 
 navbar = dbc.NavbarSimple(
-    children=[
-        dbc.NavItem(dbc.NavLink(page['name'], href=page["relative_path"])) for page in dash.page_registry.values()
-    ],
+    children=navbarChildren,
     brand="Group 11 Data visualization project",
     brand_href="/",
     color="dark",
