@@ -5,3 +5,4 @@ pandas==2.1.1
 python-dotenv==1.0.0
 these-united-states==1.1.0.21
 numpy~=1.26.1
+dash-bootstrap-components~=1.5.0
