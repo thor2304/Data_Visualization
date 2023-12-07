@@ -12,7 +12,7 @@ navbar = dbc.NavbarSimple(
         dbc.NavItem(dbc.NavLink(page['name'], href=page["relative_path"])) for page in dash.page_registry.values()
     ],
     brand="Group 11 Data visualization project",
-    brand_href="/home",
+    brand_href="/",
     color="dark",
     dark=True,
 )
@@ -20,7 +20,10 @@ navbar = dbc.NavbarSimple(
 app.layout = html.Div([
     navbar,
     html.Br(),
-    dash.page_container
+    dash.page_container,
+
+    # store
+    dcc.Store(id='pandas_data', storage_type='memory'),
 ])
 
 
