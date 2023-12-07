@@ -5,19 +5,22 @@ import plotly.express as px
 
 
 from src.Core.data_provider import get_df
-from src.Core.styles import graphStyle, dropdownStyle
+from src.Core.styles import graphDivStyle, pageStyle
 
 dash.register_page(__name__)
 
 df = get_df()
 
 layout = html.Div([
+    html.H1('Is there a relation between time periods in the day and certain types of accidents?', style={'textAlign': 'center', 'width': '60%'}),
     html.Div([
-        html.H1('Is there a relation between time periods in the day and certain types of accidents?', style={'textAlign': 'center'}),
-        dcc.Dropdown(df["Rail/Bus/Ferry"].unique(), 'Bus', id='3d-dropdown-selection', style=dropdownStyle),
-        dcc.Graph(id='3d-graph', style=graphStyle),
-    ], style={'width': '60%'}),
-], style={'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}, )
+        html.Div([
+            dcc.Dropdown(df["Rail/Bus/Ferry"].unique(), 'Bus', id='3d-dropdown-selection', style={'width': '50%', 'justify-content': 'end'}),
+        ], style={'width': '100%', 'display': 'flex', 'justify-content': 'end', 'align-items': 'center'}),
+        dcc.Graph(id='3d-graph', style={'width': '100%', 'height': '60em'}),
+        html.H1('', style={'textAlign': 'center '}),
+    ], style=graphDivStyle),
+], style=pageStyle)
 
 
 
