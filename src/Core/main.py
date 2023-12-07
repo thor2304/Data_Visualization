@@ -21,9 +21,6 @@ app.layout = html.Div([
     navbar,
     html.Br(),
     dash.page_container,
-
-    # store
-    dcc.Store(id='pandas_data', storage_type='memory'),
 ])
 
 

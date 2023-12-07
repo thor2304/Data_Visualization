@@ -13,7 +13,7 @@ df = get_df()
 
 layout = html.Div([
     html.Div([
-        html.H1('Is there a relation between time periods in the day and certain types of accidents?'),
+        html.H1('Is there a relation between time periods in the day and certain types of accidents?', style={'textAlign': 'center'}),
         dcc.Dropdown(df["Rail/Bus/Ferry"].unique(), 'Bus', id='3d-dropdown-selection', style=dropdownStyle),
         dcc.Graph(id='3d-graph', style=graphStyle),
     ], style={'width': '60%'}),
