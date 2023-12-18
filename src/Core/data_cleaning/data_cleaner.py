@@ -176,7 +176,7 @@ def add_event_divided_by_citizens(df: pd.DataFrame):
     state_population = pd.read_csv(f"../data/states-population.csv")
 
     for index, row in df.iterrows():
-        print(f"index: {index}")
+        print(f"index: {index} of {len(df)}")
         state = row['State']
         if state == "Unknown" or state == "Puerto Rico":
             continue
@@ -194,7 +194,7 @@ def add_state_column(df: pd.DataFrame):
     data['State'] = agencies['State']
 
     for index, row in df.iterrows():
-        print(f"index: {index}")
+        print(f"index: {index} of {len(df)}")
         agency_id = row['NTD ID']
         results = data.loc[data['NTD ID'] == str(agency_id)]
         if len(results) == 0:
