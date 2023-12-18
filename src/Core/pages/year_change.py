@@ -58,10 +58,10 @@ layout = html.Div([
         html.H3(children="Horizontal bar graph", style={'textAlign': 'center'}),
         dcc.RangeSlider(
             min=0,
-            max=9 * 12,
+            max=9 * 12 - 1,  # - 1 because the index starts at 0
             step=1,
             marks={0: '2014-January', 12: '2015-January', 24: '2016-January', 36: '2017-January', 48: '2018-January',
-                   60: '2019-January', 72: '2020-January', 84: '2021-January', 96: '2022-January'
+                   60: '2019-January', 72: '2020-January', 84: '2021-January', 96: '2022-January', 107: '2022-December'
                    },
             value=[49, 60],
             id='horizontal-bar-graph-slider',
@@ -172,6 +172,15 @@ def update_horizontal_bar_graph(value) -> Figure:
 
     print(activeRows)
 
-    return px.histogram(activeRows, x="Event Per Mil Citizens", y="State", color='Event Type Group', orientation='h',
-                        height=400,
+    # Sort in descending order
+
+    fig = px.histogram(activeRows, x="Event Per Mil Citizens", y="State", color='Event Type Group', orientation='h',
+                        height=1200,
                         title="Years chosen by slider " + inputMarks[value[0]] + " to " + inputMarks[value[1]])
+
+    fig.update_yaxes(
+        categoryorder="total ascending",
+        title_text="States"
+    )
+
+    return fig
