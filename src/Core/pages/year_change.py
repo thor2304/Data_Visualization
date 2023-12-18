@@ -95,7 +95,6 @@ def update_horizontal_bar_graph(value: str) -> Figure:
 
     xd = px.data.tips()
     print(xd)
-    return px.histogram(df, x="Event Per Mil Citizens", y="Event Type Group", color='Month', orientation='h',
+    return px.histogram(df, x="Event Per Mil Citizens", y="State", color='Event Type Group', orientation='h',
                         hover_data=['Event Per Mil Citizens', 'Event Type Group', 'Month'],
-                        height=400,
-                        title='Event Type per Month')
+                        height=400)
