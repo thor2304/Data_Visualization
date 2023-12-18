@@ -11,6 +11,7 @@ import united_states
 from src.Core.data_provider import get_df
 from src.Core.styles import graphStyle, dropdownStyle
 
+# The following dicts are used to map the index of the slider to a date.
 inputMarks = {
     0: '2014-January', 1: '2014-February', 2: '2014-March', 3: '2014-April', 4: '2014-May', 5: '2014-June',
     6: '2014-July', 7: '2014-August', 8: '2014-September', 9: '2014-October', 10: '2014-November', 11: '2014-December',
@@ -31,6 +32,10 @@ inputMarks = {
     95: '2021-December', 96: '2022-January', 97: '2022-February', 98: '2022-March', 99: '2022-April', 100: '2022-May',
     101: '2022-June', 102: '2022-July', 103: '2022-August', 104: '2022-September', 105: '2022-October',
     106: '2022-November', 107: '2022-December'
+}
+months = {
+    0: "January", 1: "February", 2: "March", 3: "April", 4: "May", 5: "June", 6: "July", 7: "August",
+    8: "September", 9: "October", 10: "November", 11: "December"
 }
 
 dash.register_page(__name__, name="Do more happen every year?")
@@ -127,10 +132,6 @@ def update_bar_event_graph(value: str) -> Figure:
     Input('horizontal-bar-graph-slider', 'value')
 )
 def update_horizontal_bar_graph(value) -> Figure:
-    print(f"Starting update")
-    # From the input value map the first index year and month to the start date
-    # and the second index year and month to the end date
-
     # Get Year and month from the two values in value
     # The first value is the start date
     # The second value is the end date
@@ -139,45 +140,31 @@ def update_horizontal_bar_graph(value) -> Figure:
     year2 = int(inputMarks[value[1]].split("-")[0])
     month2 = inputMarks[value[1]].split("-")[1]
 
-    print(f"year1 {year1} month1 {month1} year2 {year2} month2 {month2}")
-
-    months = {
-        0: "January", 1: "February", 2: "March", 3: "April", 4: "May", 5: "June", 6: "July", 7: "August",
-        8: "September", 9: "October", 10: "November", 11: "December"
-    }
-
     # Map month 1 and month2 to the month number
     month1 = list(months.keys())[list(months.values()).index(month1)] + 1
     month2 = list(months.keys())[list(months.values()).index(month2)] + 1
 
-    print(f"year1 {year1} month1 {month1} year2 {year2} month2 {month2}")
+    date_start = pd.Timestamp(year=year1, month=month1, day=1, hour=0, minute=0, second=0)
 
-    date1 = pd.Timestamp(year=year1, month=month1, day=1, hour=0, minute=0, second=0)
-    print(f"date1 {date1}")
+    # subtract 1 nano second from dateEnd to get the last day of the month. This does not work for the last month of the year
+    print(f"month2: {month2}")
+    if month2 == 12:
+        date_end = pd.Timestamp(year=year2, month=month2, day=31, hour=23, minute=59, second=59)
+    else:
+        date_end = pd.Timestamp(year=year2, month=month2 + 1, day=1, hour=0, minute=0, second=0) - pd.Timedelta(
+            nanoseconds=1)
 
-    date2 = pd.Timestamp(year=year2, month=month2, day=1, hour=0, minute=0, second=0)
-    print(f"date2 {date2}")
-
-    dateStart = pd.Timestamp(year=year1, month=month1, day=1, hour=0, minute=0, second=0)
-
-    print(f"dateStart {dateStart}")
-
-    dateEnd = pd.Timestamp(year=year2, month=month2, day=1, hour=0, minute=0, second=0)
-
-    print(f"dateEnd {dateEnd}")
+    print(f"date_start: {date_start} date_end: {date_end}")
 
     # Filter the df so only the rows within dateStart and dateEnd are left
-    mask = (df['Event Date'] >= dateStart) & (df['Event Date'] <= dateEnd)
-    activeRows = df[mask]
+    mask = (df['Event Date'] >= date_start) & (df['Event Date'] <= date_end)
+    active_rows = df[mask]
 
-    print(activeRows)
+    fig = px.histogram(active_rows, x="Event Per Mil Citizens", y="State", color='Event Type Group', orientation='h',
+                       height=1200,
+                       title="Years chosen by slider " + inputMarks[value[0]] + " to " + inputMarks[value[1]])
 
     # Sort in descending order
-
-    fig = px.histogram(activeRows, x="Event Per Mil Citizens", y="State", color='Event Type Group', orientation='h',
-                        height=1200,
-                        title="Years chosen by slider " + inputMarks[value[0]] + " to " + inputMarks[value[1]])
-
     fig.update_yaxes(
         categoryorder="total ascending",
         title_text="States"
