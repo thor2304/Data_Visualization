@@ -147,14 +147,11 @@ def update_horizontal_bar_graph(value) -> Figure:
     date_start = pd.Timestamp(year=year1, month=month1, day=1, hour=0, minute=0, second=0)
 
     # subtract 1 nano second from dateEnd to get the last day of the month. This does not work for the last month of the year
-    print(f"month2: {month2}")
     if month2 == 12:
         date_end = pd.Timestamp(year=year2, month=month2, day=31, hour=23, minute=59, second=59)
     else:
         date_end = pd.Timestamp(year=year2, month=month2 + 1, day=1, hour=0, minute=0, second=0) - pd.Timedelta(
             nanoseconds=1)
-
-    print(f"date_start: {date_start} date_end: {date_end}")
 
     # Filter the df so only the rows within dateStart and dateEnd are left
     mask = (df['Event Date'] >= date_start) & (df['Event Date'] <= date_end)
