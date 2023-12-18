@@ -131,7 +131,7 @@ def main():
     # Drop rows where Year is 2023
     df = df[df['Year'] != 2023]
 
-    # df = add_month_column(df)
+    df = add_month_column(df)
     df = add_state_column(df)
     df = add_event_divided_by_citizens(df)
 

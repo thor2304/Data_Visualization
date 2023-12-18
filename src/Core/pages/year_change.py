@@ -92,61 +92,10 @@ def update_bar_event_graph(value: str) -> Figure:
     Input('horizontal-bar-graph', 'figure')
 )
 def update_horizontal_bar_graph(value: str) -> Figure:
-    # TO:DO create a dataframe containing the data for the horizontal bar graph
-    # The dataframe should consist of the following columns:
-    # Year, Month, Event Type Group, County ID
 
-    # Create an empty dataframe
-    out = pd.DataFrame()
-
-    # Add the columns to the dataframe
-    out['Year'] = df['Year']
-    out['Event Type Group'] = df['Event Type Group']
-
-    # Map date to month
-    # The date is in the following format 6/30/2023 (month/day/year)
-    # for index, row in df.iterrows():
-    #     out.at[index, 'Month'] = row['Event Date'].
-
-    for index, row in df.iterrows():
-        out.at[index, 'Month'] = row['Event Date'].month_name()
-
-    # print(df['Event Date'])
-    # print("######################################################")
-    # print(out)
-
-    us = united_states.UnitedStates()
-
-    for index, row in df.iterrows():
-        print(us.from_coords(row['Latitude'], row['Longitude'])[0].name)
-        out.at[index, 'County ID'] = us.from_coords(row['Latitude'], row['Longitude'])[0].name
-
-    # Use coordinates to map an entry to a state
-    # for index, row in df.iterrows():
-    #     if row['LatLon'] == '0,0':
-    #         continue
-    #     else:
-    #         out.at[index, 'County ID'] = get_state(row['LatLon'])
-
-    print(out)
-
-    # Y akse baby
     xd = px.data.tips()
     print(xd)
-    return px.histogram(xd, x="total_bill", y="sex", color='day', orientation='h',
-                        hover_data=["tip", "size"],
+    return px.histogram(df, x="Event Per Mil Citizens", y="Event Type Group", color='Month', orientation='h',
+                        hover_data=['Event Per Mil Citizens', 'Event Type Group', 'Month'],
                         height=400,
-                        title='Restaurant bills')
-
-
-def add_month_column(df: pd.DataFrame):
-    for index, row in df.iterrows():
-        row['Month'] = row['Event Date'].month_name()
-    return df
-
-def add_state_column(df: pd.DataFrame):
-    us = united_states.UnitedStates()
-    for index, row in df.iterrows():
-        row['County ID'] = us.from_coords(row['Latitude'], row['Longitude'])[0].name
-    return df
-
+                        title='Event Type per Month')
