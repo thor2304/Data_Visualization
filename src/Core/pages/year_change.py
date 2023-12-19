@@ -70,6 +70,12 @@ layout = html.Div([
                 inline=False,
                 labelStyle={'display': 'flex', 'align-items': 'center'},
             ),
+            html.H3(children="Choose whether to normalise data", style={'textAlign': 'center', 'padding-top': 20}),
+            dcc.RadioItems(
+                id='event-normaliser',
+                options=["Normalise data", "Don't normalise data"],
+                value="Don't normalise data",
+                labelStyle={'display': 'flex'}),
         ], style={'width': '60%', 'margin': 'auto', 'height': '100%'}),
         dcc.Graph(id='event-graph', style=graphStyle),
         html.H1('', style={'textAlign': 'center '}),
@@ -105,16 +111,28 @@ layout = html.Div([
 # EVENT GRAPH #################################################################
 @callback(
     Output('event-graph', 'figure'),
-    Input('event-checklist', 'value')
+    Input('event-checklist', 'value'),
+    Input('event-normaliser', 'value')
 )
-def update_event_graph(value: str) -> Figure:
-
+def update_event_graph(value: str, value2: str) -> Figure:
     # Mask to get active rows dependendt on input value
     mask = df['Event Type Group'].isin(value)
     active_rows = df[mask]
 
     # Get amount of events per year per event type
     active_rows = active_rows.groupby(['Year', 'Event Type Group']).size().reset_index(name='Amount of Events')
+
+    # If normalise the data should visualize how much each event type increases/decreases each year
+    # Each event type should be indexed to the first year. This means that the first year should be 100%
+    # Then next year should be divided by the first year and multiplied by 100 to get the percentage increase/decrease
+    if value2 == "Normalise data":
+        # Get the first year for each event type
+        first_year = active_rows.groupby(['Event Type Group'])['Amount of Events'].transform('first')
+
+        # Divide the amount of events for each year by the first year and multiply by 100
+        active_rows['Amount of Events'] = active_rows['Amount of Events'] / first_year * 100
+
+    print (active_rows)
 
     fig = px.line(active_rows, x="Year", y="Amount of Events", color="Event Type Group", title="Events per year")
 
