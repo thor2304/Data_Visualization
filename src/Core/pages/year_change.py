@@ -9,7 +9,7 @@ import plotly.express as px
 import united_states
 
 from src.Core.data_provider import get_df
-from src.Core.styles import graphStyle, dropdownStyle
+from src.Core.styles import graphStyle, dropdownStyle, pageStyle, graphDivStyle
 
 # The following dicts are used to map the index of the slider to a date.
 inputMarks = {
@@ -46,35 +46,55 @@ df = get_df()
 eventsListRaw = df["Event Type Group"].unique()
 eventsList = np.delete(eventsListRaw, np.where(eventsListRaw == "Non-RGX Collision"))
 
+
 layout = html.Div([
+    html.H1(children="Is there an increase or decrease in certain types of accidents in the last 9 years?",
+            style={'textAlign': 'center'}),
+
+    # BAR GRAPH #####################################################################
+    html.H3(children="Graph showing amount of events", style={'textAlign': 'center'}),
     html.Div([
-        html.H1(children="Is there an increase or decrease in certain types of accidents in the last 9 years?",
-                style={'textAlign': 'center'}),
-        # BAR GRAPH
-        html.H3(children="Graph showing amount of events", style={'textAlign': 'center'}),
+        html.H1('', style={'textAlign': 'center '}),
         dcc.Graph(id='bar-event-graph', style=graphStyle),
+        html.H1('', style={'textAlign': 'center '}),
+    ], style=graphDivStyle),
 
-        # EVENT GRAPH
-        html.H3(children="Events per year", style={'textAlign': 'center'}),
-        dcc.Dropdown(eventsList, 'Collision', id='event-dropdown-selection', style=dropdownStyle),
+    # EVENT GRAPH ###################################################################
+    html.H3(children="Events per year", style={'textAlign': 'center'}),
+    html.Div([
+        html.Div([
+            html.H3(children="Choose event type", style={'textAlign': 'center'}),
+            dcc.Dropdown(eventsList, 'Collision', id='event-dropdown-selection', style={'width': '100%'}),
+        ], style={'width': '60%', 'margin': 'auto', 'height': '100%'}),
         dcc.Graph(id='event-graph', style=graphStyle),
+        html.H1('', style={'textAlign': 'center '}),
+    ], style=graphDivStyle),
 
-        # HORIZONTAL BAR GRAPH
-        html.H3(children="Horizontal bar graph", style={'textAlign': 'center'}),
-        dcc.RangeSlider(
-            min=0,
-            max=9 * 12 - 1,  # - 1 because the index starts at 0
-            step=1,
-            marks={0: '2014-January', 12: '2015-January', 24: '2016-January', 36: '2017-January', 48: '2018-January',
-                   60: '2019-January', 72: '2020-January', 84: '2021-January', 96: '2022-January', 107: '2022-December'
-                   },
-            value=[49, 60],
-            id='horizontal-bar-graph-slider',
-        ),
-        dcc.Graph(id='horizontal-bar-graph', style=graphStyle),
+    # HORIZONTAL BAR GRAPH #########################################################
+    html.H3(children="Horizontal bar graph", style={'textAlign': 'center'}),
+    html.P(children="Hello, this is some text. "
+                    "It should be outline on two lines "),
+    html.Div([
+        html.H1('', style={'textAlign': 'center '}),
+        html.Div([
+            dcc.RangeSlider(
+                min=0,
+                max=9 * 12 - 1,  # - 1 because the index starts at 0
+                step=1,
+                marks={0: '2014-January', 12: '2015-January', 24: '2016-January', 36: '2017-January',
+                       48: '2018-January',
+                       60: '2019-January', 72: '2020-January', 84: '2021-January', 96: '2022-January',
+                       107: '2022-December'
+                       },
+                value=[49, 60],
+                id='horizontal-bar-graph-slider',
+            ),
+            dcc.Graph(id='horizontal-bar-graph', style=graphStyle),
+            html.H1('', style={'textAlign': 'center '}),
+        ]),
+    ], style=graphDivStyle),
 
-    ], style={'width': '60%'}),
-], style={'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}, )
+], style=pageStyle)
 
 
 # EVENT GRAPH #################################################################
