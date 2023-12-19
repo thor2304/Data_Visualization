@@ -46,7 +46,6 @@ df = get_df()
 eventsListRaw = df["Event Type Group"].unique()
 eventsList = np.delete(eventsListRaw, np.where(eventsListRaw == "Non-RGX Collision"))
 
-
 layout = html.Div([
     html.H1(children="Is there an increase or decrease in certain types of accidents in the last 9 years?",
             style={'textAlign': 'center'}),
@@ -64,7 +63,13 @@ layout = html.Div([
     html.Div([
         html.Div([
             html.H3(children="Choose event type", style={'textAlign': 'center'}),
-            dcc.Dropdown(eventsList, 'Collision', id='event-dropdown-selection', style={'width': '100%'}),
+            dcc.Checklist(
+                id="event-checklist",
+                options=[{'label': i, 'value': i} for i in eventsList],
+                value=[eventsList[0]],
+                inline=True,
+                style={'width': '100%'}
+            ),
         ], style={'width': '60%', 'margin': 'auto', 'height': '100%'}),
         dcc.Graph(id='event-graph', style=graphStyle),
         html.H1('', style={'textAlign': 'center '}),
@@ -86,7 +91,7 @@ layout = html.Div([
                        60: '2019-January', 72: '2020-January', 84: '2021-January', 96: '2022-January',
                        107: '2022-December'
                        },
-                value=[49, 60],
+                value=[48, 60],
                 id='horizontal-bar-graph-slider',
             ),
             dcc.Graph(id='horizontal-bar-graph', style=graphStyle),
@@ -100,30 +105,28 @@ layout = html.Div([
 # EVENT GRAPH #################################################################
 @callback(
     Output('event-graph', 'figure'),
-    Input('event-dropdown-selection', 'value')
+    Input('event-checklist', 'value')
 )
 def update_event_graph(value: str) -> Figure:
-    # Create list from year column
-    list_of_years = df['Year'].unique().tolist()
-    list_of_years.sort()
+    # Line chart for each of the Event Type Group.
+    # The Line chart displays the event types from the input value
+    # The line chart displays the amount of events per year
+    # The input will be multiple values.
 
-    # Create new dataframe to store data
-    out = pd.DataFrame()
+    mask = df['Event Type Group'].isin(value)
+    activeRows = df[mask]
 
-    # Add year column from original data starting from the lowest year to highest
-    out['Year'] = list_of_years
+    # x axis should be Year
+    # y axis should be Amount of Events
 
-    # Calculate number of events per year one event type
-    counts = df[df['Event Type Group'] == value]['Year'].value_counts()
-    counts.sort_index(inplace=True, ascending=True)
+    # Get amount of events per year per event type
+    activeRows = activeRows.groupby(['Year', 'Event Type Group']).size().reset_index(name='Amount of Events')
 
-    # Add event type column to new dataframe
-    out[value] = counts.values
+    print(activeRows)
 
-    return px.line(out, x='Year', y=value, markers=True, labels={
-        value: "Amount of events",
-        "Year": "Years",
-    })
+    fig = px.line(activeRows, x="Year", y="Amount of Events", color="Event Type Group", title="Events per year")
+
+    return fig
 
 
 # BAR GRAPH #################################################################
@@ -132,18 +135,19 @@ def update_event_graph(value: str) -> Figure:
     Input('bar-event-graph', 'figure')
 )
 def update_bar_event_graph(value: str) -> Figure:
-    # Y akse baby
-    y_akse = pd.DataFrame()
-    temp_data = df['Event Type Group'].value_counts().sort_index()
-    temp_data.drop('Non-RGX Collision', inplace=True)  # Remove Non-RGX Collision from list
-    y_akse['Event Type Group'] = temp_data.values
+    # Filter out Non-RGX Collision
+    df_filtered = df[df['Event Type Group'] != "Non-RGX Collision"]
 
-    # X akse baby
-    x_akse_raw = df['Event Type Group'].unique()
-    x_akse = np.delete(x_akse_raw, np.where(x_akse_raw == "Non-RGX Collision"))  # Remove Non-RGX Collision from list
-    x_akse.sort()
+    fig = px.histogram(df_filtered, x="Event Type Group", color="Event Type Group",
+                       title="Amount of events per event type")
 
-    return px.bar(x=x_akse, y=y_akse['Event Type Group'])
+    # sort in descending order
+    fig.update_xaxes(
+        categoryorder="total descending",
+        title_text="Event Type Group"
+    )
+
+    return fig
 
 
 ## Horizontal bar graph
