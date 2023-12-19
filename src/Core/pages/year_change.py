@@ -9,7 +9,7 @@ import plotly.express as px
 import united_states
 
 from src.Core.data_provider import get_df
-from src.Core.styles import graphStyle, dropdownStyle, pageStyle, graphDivStyle
+from src.Core.styles import graphStyle, dropdownStyle, pageStyle, graphDivStyle, textStyle, textTitleStyle
 
 # The following dicts are used to map the index of the slider to a date.
 inputMarks = {
@@ -48,10 +48,26 @@ eventsList = np.delete(eventsListRaw, np.where(eventsListRaw == "Non-RGX Collisi
 
 layout = html.Div([
     html.H1(children="Is there an increase or decrease in certain types of accidents in the last 9 years?",
-            style={'textAlign': 'center'}),
+            style={'textAlign': 'center', 'padding-bottom': 20, 'padding-top': 50}),
+    html.P(children="To answer this question, the page contains three different graphs. "
+                    "The first graph is a bar graph, which shows the amount of events in the period 2014-2022. "
+                    "The second graph is a line graph, which shows the amount of events per year for each event type. "
+                    "This graph highlights the evolution of the different event types over the years."
+                    "The third graph is a horizontal bar graph, which shows the amount of events per state for a specific year or a range of years. ",
+           style=textStyle),
 
     # BAR GRAPH #####################################################################
-    html.H3(children="Graph showing amount of events", style={'textAlign': 'center'}),
+    html.H3(children="Amount of events in the period 2014-2022", style=textTitleStyle),
+    html.P(children="The amount of events in the period 2014-2022, is shown through a bar graph. "
+                    "The bar graph aims at visualizing the amount of events for each event type."
+                    "This should result in a clear overview of the amount of events for each event type. ",
+           style=textStyle),
+    html.P(children="From the bar graph it is clear that collisions and assaults are the most common event types. "
+                    "The other event types are rare compared to collisions and assaults. "
+                    "The event types Security and Other may not be as clear as the other event types in the context of what they include. "
+                    "The event type Security includes events such as bomb threats, hijackings and random gun fire. "
+                    "The event type Other includes events such as people falling, people getting sick and people getting lost. ",
+           style=textStyle),
     html.Div([
         html.H1('', style={'textAlign': 'center '}),
         dcc.Graph(id='bar-event-graph', style=graphStyle),
@@ -59,7 +75,16 @@ layout = html.Div([
     ], style=graphDivStyle),
 
     # EVENT GRAPH ###################################################################
-    html.H3(children="Events per year", style={'textAlign': 'center'}),
+    html.H3(children="Events per year", style=textTitleStyle),
+    html.P(
+        children="To visualize the evolution of the amount of different accidents per year, line graphs were created. "
+                 "The line graphs show the amount of events per year for each event type. "
+                 "On the left side of the graph the different Event Types can be selected. ",
+        style=textStyle),
+    html.P(children="Since the amount of events per year varies a lot between the different event types, "
+                    "the data can be normalised. "
+                    "Normalising the data means that the different Event Types are indexed to the first year. ",
+           style=textStyle),
     html.Div([
         html.Div([
             html.H3(children="Choose event type", style={'textAlign': 'center'}),
@@ -82,9 +107,17 @@ layout = html.Div([
     ], style=graphDivStyle),
 
     # HORIZONTAL BAR GRAPH #########################################################
-    html.H3(children="Horizontal bar graph", style={'textAlign': 'center'}),
-    html.P(children="Hello, this is some text. "
-                    "It should be outline on two lines "),
+    html.H3(children="Horizontal bar graph", style=textTitleStyle),
+    html.P(
+        children="Up to now, we have seen that the amount of events per year varies a lot between the different event types. "
+                 "Generally, collisions and assaults are the most common event types, while the other event types are less common. "
+                 "The goal with the following horizontal bar graph is to see if some event types are more common in certain states. "
+                 "The graph is sorted in descending order based on the amount of events in the chosen period.",
+        style=textStyle),
+    html.P(children="Using the slider below, a specific year or a range of years can be selected, "
+                    "which in return will be visualized in the graph.",
+           style={'width': '40%', 'padding-bottom': 20}),
+
     html.Div([
         html.H1('', style={'textAlign': 'center '}),
         html.Div([
@@ -115,7 +148,6 @@ layout = html.Div([
     Input('event-normaliser', 'value')
 )
 def update_event_graph(value: str, value2: str) -> Figure:
-
     labels = {
         "Year": "Years",
         "Amount of Events": "Amount of events",
@@ -169,8 +201,7 @@ def update_bar_event_graph(value: str) -> Figure:
     # Filter out Non-RGX Collision
     df_filtered = df[df['Event Type Group'] != "Non-RGX Collision"]
 
-    fig = px.histogram(df_filtered, x="Event Type Group", color="Event Type Group",
-                       title="Amount of events per event type")
+    fig = px.histogram(df_filtered, x="Event Type Group", color="Event Type Group")
 
     # sort in descending order
     fig.update_xaxes(
