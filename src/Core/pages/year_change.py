@@ -115,6 +115,12 @@ layout = html.Div([
     Input('event-normaliser', 'value')
 )
 def update_event_graph(value: str, value2: str) -> Figure:
+
+    labels = {
+        "Year": "Years",
+        "Amount of Events": "Amount of events",
+    }
+
     # Mask to get active rows dependendt on input value
     mask = df['Event Type Group'].isin(value)
     active_rows = df[mask]
@@ -126,38 +132,25 @@ def update_event_graph(value: str, value2: str) -> Figure:
     # Each event type should be indexed to the first year. This means that the first year should be 100%
     # Then next year should be divided by the first year and multiplied by 100 to get the percentage increase/decrease
     if value2 == "Normalise data":
+        labels["Amount of Events"] = "Percentage increase/decrease"
+
         # Get the first year for each event type
         first_year = active_rows.groupby(['Event Type Group'])['Amount of Events'].transform('first')
 
         # Divide the amount of events for each year by the first year and multiply by 100
         active_rows['Amount of Events'] = active_rows['Amount of Events'] / first_year * 100
 
-    # Adjust title if normalize is true
-    title = "Events per year"
-    if value2 == "Normalise data":
-        title = "Events per year (normalised to percentage increase/decrease)"
-
-    labels = {
-        "Year": "Years",
-        "Amount of Events": "Amount of events",
-    }
-
-    if value2 == "Normalise data":
-        labels["Amount of Events"] = "Percentage increase/decrease"
-
     fig = px.line(
         active_rows,
         x="Year",
         y="Amount of Events",
         color="Event Type Group",
-        title=title,
         labels=labels,
     )
 
     # Make fig's y axis start at 0
     max = active_rows['Amount of Events'].max()
     min = active_rows['Amount of Events'].min()
-    print(f"Max: {max}, Min: {min}")
 
     if value2 == "Normalise data":
         fig.update_yaxes(range=[min * 0.9, max * 1.1])
