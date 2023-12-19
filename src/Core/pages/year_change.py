@@ -65,10 +65,10 @@ layout = html.Div([
             html.H3(children="Choose event type", style={'textAlign': 'center'}),
             dcc.Checklist(
                 id="event-checklist",
-                options=[{'label': i, 'value': i} for i in eventsList],
+                options=[{'label': html.Span(i, style={'padding-left': 10}), 'value': i} for i in eventsList],
                 value=[eventsList[0]],
-                inline=True,
-                style={'width': '100%'}
+                inline=False,
+                labelStyle={'display': 'flex', 'align-items': 'center'},
             ),
         ], style={'width': '60%', 'margin': 'auto', 'height': '100%'}),
         dcc.Graph(id='event-graph', style=graphStyle),
@@ -117,6 +117,10 @@ def update_event_graph(value: str) -> Figure:
     active_rows = active_rows.groupby(['Year', 'Event Type Group']).size().reset_index(name='Amount of Events')
 
     fig = px.line(active_rows, x="Year", y="Amount of Events", color="Event Type Group", title="Events per year")
+
+    # Make fig's y axis start at 0
+    max = active_rows['Amount of Events'].max()
+    fig.update_yaxes(range=[0, max * 1.1])
 
     return fig
 
