@@ -58,12 +58,6 @@ def update_3d_plot(value: str, y_selection: str) -> Figure:
     mask = df['Event Type Group'].isin(value)
     active_rows = df[mask]
 
-    active_rows["Number of accidents"] = 1
-
-    active_rows['Hour'] = active_rows['Event Time'].apply(
-        lambda x: x.replace(second=0, microsecond=0, minute=0, hour=x.hour)
-    )
-
     # Hover could be solved by adding another column, that is Hour.dt.time, and then show that.
     fig = px.histogram(active_rows, x="Hour", y=y_selection, color='Event Type Group', orientation='v',
 
