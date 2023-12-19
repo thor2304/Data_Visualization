@@ -4,7 +4,7 @@ from plotly.graph_objs import Figure
 import plotly.express as px
 import numpy as np
 
-from src.Core.data_provider import get_df
+from src.Core.data_provider import get_df, get_category_orders
 from src.Core.styles import graphDivStyle, pageStyle, graphStyle
 
 dash.register_page(__name__)
@@ -21,7 +21,8 @@ layout = html.Div([
         html.Div([
             html.H3(children="Choose Y-axis", style={'textAlign': 'center'}),
             dcc.Dropdown(["Total Injuries", "Number of accidents"], 'Total Injuries', id='type-dropdown-selection',
-                         style={'width': '100%', 'justify-content': 'end'}),
+                         style={'width': '100%', 'justify-content': 'end'},
+                         clearable=False),
             html.H3(children="Choose event type", style={'textAlign': 'center', 'padding-top': 20}),
             dcc.Checklist(
                 id="event-checklist",
@@ -60,7 +61,7 @@ def update_3d_plot(value: str, y_selection: str) -> Figure:
 
     # Hover could be solved by adding another column, that is Hour.dt.time, and then show that.
     fig = px.histogram(active_rows, x="Hour", y=y_selection, color='Event Type Group', orientation='v',
-
+                       category_orders=get_category_orders()
                        # height=800,
                        # title="Number of accidents per hour of the day"
                        )

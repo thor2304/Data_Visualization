@@ -8,8 +8,8 @@ from plotly.graph_objs import Figure
 import plotly.express as px
 import united_states
 
-from src.Core.data_provider import get_df
-from src.Core.styles import graphStyle, dropdownStyle, pageStyle, graphDivStyle, textStyle, textTitleStyle
+from src.Core.data_provider import get_df, get_category_orders
+from src.Core.styles import graphStyle, dropdownStyle, pageStyle, graphDivStyle, textStyle, textTitleStyle, labelStyle
 
 # The following dicts are used to map the index of the slider to a date.
 inputMarks = {
@@ -91,7 +91,7 @@ layout = html.Div([
             dcc.Checklist(
                 id="event-checklist",
                 options=[{'label': html.Span(i, style={'padding-left': 10}), 'value': i} for i in eventsList],
-                value=[eventsList[0]],
+                value=eventsList,
                 inline=False,
                 labelStyle={'display': 'flex', 'align-items': 'center'},
             ),
@@ -178,16 +178,17 @@ def update_event_graph(value: str, value2: str) -> Figure:
         y="Amount of Events",
         color="Event Type Group",
         labels=labels,
+        category_orders=get_category_orders()
     )
 
-    # Make fig's y axis start at 0
-    max = active_rows['Amount of Events'].max()
-    min = active_rows['Amount of Events'].min()
-
     if value2 == "Normalise data":
-        fig.update_yaxes(range=[min * 0.9, max * 1.1])
+        fig.update_yaxes(ticksuffix="%")
     else:
-        fig.update_yaxes(range=[0, max * 1.1])
+        fig.update_yaxes(autorangeoptions_include=[0])
+
+    fig.update_layout(
+        hoverlabel=labelStyle,
+    )
 
     return fig
 
@@ -197,11 +198,8 @@ def update_event_graph(value: str, value2: str) -> Figure:
     Output('bar-event-graph', 'figure'),
     Input('bar-event-graph', 'figure')
 )
-def update_bar_event_graph(value: str) -> Figure:
-    # Filter out Non-RGX Collision
-    df_filtered = df[df['Event Type Group'] != "Non-RGX Collision"]
-
-    fig = px.histogram(df_filtered, x="Event Type Group", color="Event Type Group")
+def update_bar_event_graph(_: str) -> Figure:
+    fig = px.histogram(df, x="Event Type Group", color="Event Type Group", category_orders=get_category_orders())
 
     # sort in descending order
     fig.update_xaxes(
@@ -245,7 +243,9 @@ def update_horizontal_bar_graph(value) -> Figure:
 
     fig = px.histogram(active_rows, x="Event Per Mil Citizens", y="State", color='Event Type Group', orientation='h',
                        height=1200,
-                       title="Years chosen by slider " + inputMarks[value[0]] + " to " + inputMarks[value[1]])
+                       title="Years chosen by slider " + inputMarks[value[0]] + " to " + inputMarks[value[1]],
+                       category_orders=get_category_orders()
+                       )
 
     # Sort in descending order
     fig.update_yaxes(

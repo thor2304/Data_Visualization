@@ -20,7 +20,19 @@ def get_df():
         df['Event Date'] = pd.to_datetime(df['Event Date'])
         df['Event Time'] = pd.to_datetime(df['Event Time'])
 
-    print("data fetched")
-    print(df.columns[12])
-    print(df["Event Time"])
+    # print("data fetched")
+    # print(df.columns[12])
+    # print(df["Event Time"])
+
     return df
+
+
+category_orders = None
+
+
+def get_category_orders() -> dict:
+    global category_orders
+    if category_orders is not None:
+        return category_orders
+    category_orders = {"Event Type Group": sorted(get_df()["Event Type Group"].unique())}
+    return category_orders

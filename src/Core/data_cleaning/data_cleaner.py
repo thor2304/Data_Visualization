@@ -137,6 +137,8 @@ def main():
     df = add_event_divided_by_citizens(df)
     add_columns_for_time_of_day(df)
 
+    df = df[df['Event Type Group'] != "Non-RGX Collision"]
+
     df = cap_column(df, "Vehicle Speed", 200)
 
     print(df)
