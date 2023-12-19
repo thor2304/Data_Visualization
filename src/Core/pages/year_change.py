@@ -108,23 +108,15 @@ layout = html.Div([
     Input('event-checklist', 'value')
 )
 def update_event_graph(value: str) -> Figure:
-    # Line chart for each of the Event Type Group.
-    # The Line chart displays the event types from the input value
-    # The line chart displays the amount of events per year
-    # The input will be multiple values.
 
+    # Mask to get active rows dependendt on input value
     mask = df['Event Type Group'].isin(value)
-    activeRows = df[mask]
-
-    # x axis should be Year
-    # y axis should be Amount of Events
+    active_rows = df[mask]
 
     # Get amount of events per year per event type
-    activeRows = activeRows.groupby(['Year', 'Event Type Group']).size().reset_index(name='Amount of Events')
+    active_rows = active_rows.groupby(['Year', 'Event Type Group']).size().reset_index(name='Amount of Events')
 
-    print(activeRows)
-
-    fig = px.line(activeRows, x="Year", y="Amount of Events", color="Event Type Group", title="Events per year")
+    fig = px.line(active_rows, x="Year", y="Amount of Events", color="Event Type Group", title="Events per year")
 
     return fig
 
