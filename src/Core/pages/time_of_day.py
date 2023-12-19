@@ -5,9 +5,9 @@ import plotly.express as px
 import numpy as np
 
 from src.Core.data_provider import get_df, get_category_orders
-from src.Core.styles import graphDivStyle, pageStyle, graphStyle
+from src.Core.styles import graphDivStyle, pageStyle, graphStyle, legendColors
 
-dash.register_page(__name__)
+dash.register_page(__name__, name="When does injuries happen?")
 
 df = get_df()
 
@@ -23,45 +23,22 @@ layout = html.Div([
             dcc.Dropdown(["Total Injuries", "Number of accidents"], 'Total Injuries', id='type-dropdown-selection',
                          style={'width': '100%', 'justify-content': 'end'},
                          clearable=False),
-            html.H3(children="Choose event type", style={'textAlign': 'center', 'padding-top': 20}),
-            dcc.Checklist(
-                id="event-checklist",
-                options=[{'label': html.Span(i, style={'padding-left': 10}), 'value': i} for i in eventsList],
-                value=eventsList,
-                inline=False,
-                labelStyle={'display': 'flex', 'align-items': 'center'},
-            ),
-            # html.H3(children="Choose whether to normalise data", style={'textAlign': 'center', 'padding-top': 20}),
-            # dcc.RadioItems(
-            #     id='event-normaliser',
-            #     options=["Normalise data", "Don't normalise data"],
-            #     value="Don't normalise data",
-            #     labelStyle={'display': 'flex'}),
         ], style={'width': '60%', 'margin': 'auto', 'height': '100%'}),
         dcc.Graph(id='time-graph', style=graphStyle),
-        html.H1('', style={'textAlign': 'center '}),
+        html.H4('Remove event types by clicking the legend', style={'textAlign': 'center '}),
     ], style=graphDivStyle),
 ], style=pageStyle)
 
 
 @callback(
     Output('time-graph', 'figure'),
-    Input('event-checklist', 'value'),
     Input('type-dropdown-selection', 'value')
-
 )
-def update_3d_plot(value: str, y_selection: str) -> Figure:
-    # Filter the df so only the rows within dateStart and dateEnd are left
-
-    # mask = (df['Event Date'] >= date_start) & (df['Event Date'] <= date_end)
-    # active_rows = df[mask]
-
-    mask = df['Event Type Group'].isin(value)
-    active_rows = df[mask]
-
+def update_3d_plot(y_selection: str) -> Figure:
     # Hover could be solved by adding another column, that is Hour.dt.time, and then show that.
-    fig = px.histogram(active_rows, x="Hour", y=y_selection, color='Event Type Group', orientation='v',
-                       category_orders=get_category_orders()
+    fig = px.histogram(df, x="Hour", y=y_selection, color='Event Type Group', orientation='v',
+                       category_orders=get_category_orders(),
+                       color_discrete_sequence=legendColors,
                        # height=800,
                        # title="Number of accidents per hour of the day"
                        )

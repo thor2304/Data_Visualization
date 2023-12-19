@@ -9,7 +9,8 @@ import plotly.express as px
 import united_states
 
 from src.Core.data_provider import get_df, get_category_orders
-from src.Core.styles import graphStyle, dropdownStyle, pageStyle, graphDivStyle, textStyle, textTitleStyle, labelStyle
+from src.Core.styles import graphStyle, dropdownStyle, pageStyle, graphDivStyle, textStyle, textTitleStyle, labelStyle, \
+    legendColors
 
 # The following dicts are used to map the index of the slider to a date.
 inputMarks = {
@@ -178,7 +179,8 @@ def update_event_graph(value: str, value2: str) -> Figure:
         y="Amount of Events",
         color="Event Type Group",
         labels=labels,
-        category_orders=get_category_orders()
+        category_orders=get_category_orders(),
+        color_discrete_sequence=legendColors
     )
 
     if value2 == "Normalise data":
@@ -199,7 +201,8 @@ def update_event_graph(value: str, value2: str) -> Figure:
     Input('bar-event-graph', 'figure')
 )
 def update_bar_event_graph(_: str) -> Figure:
-    fig = px.histogram(df, x="Event Type Group", color="Event Type Group", category_orders=get_category_orders())
+    fig = px.histogram(df, x="Event Type Group", color="Event Type Group", category_orders=get_category_orders(),
+                       color_discrete_sequence=legendColors)
 
     # sort in descending order
     fig.update_xaxes(
@@ -244,7 +247,8 @@ def update_horizontal_bar_graph(value) -> Figure:
     fig = px.histogram(active_rows, x="Event Per Mil Citizens", y="State", color='Event Type Group', orientation='h',
                        height=1200,
                        title="Years chosen by slider " + inputMarks[value[0]] + " to " + inputMarks[value[1]],
-                       category_orders=get_category_orders()
+                       category_orders=get_category_orders(),
+                       color_discrete_sequence=legendColors
                        )
 
     # Sort in descending order

@@ -6,7 +6,9 @@ pageStyle = {'display': 'flex', 'flex-direction': 'column', 'align-items': 'cent
 textStyle = {'width': '40%', 'margin': 'auto', 'padding-bottom': 20}
 textTitleStyle = {'textAlign': 'center', 'padding-bottom': 20, 'padding-top': 50}
 
-labelStyle=dict(
-        bgcolor="white",
-        font_size=16,
-    )
+labelStyle = dict(
+    bgcolor="white",
+    font_size=16,
+)
+
+legendColors = ['#FFAB66', '#1A6EB3', '#EDABE3', '#CF4FE8', '#BEECF4', '#22AEC3', '#9F92C8']
