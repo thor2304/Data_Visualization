@@ -122,7 +122,7 @@ def update_event_graph(value: str, value2: str) -> Figure:
     # Get amount of events per year per event type
     active_rows = active_rows.groupby(['Year', 'Event Type Group']).size().reset_index(name='Amount of Events')
 
-    # If normalise the data should visualize how much each event type increases/decreases each year
+    # If normalise is true the data should visualize how much each event type increases/decreases each year
     # Each event type should be indexed to the first year. This means that the first year should be 100%
     # Then next year should be divided by the first year and multiplied by 100 to get the percentage increase/decrease
     if value2 == "Normalise data":
@@ -132,13 +132,37 @@ def update_event_graph(value: str, value2: str) -> Figure:
         # Divide the amount of events for each year by the first year and multiply by 100
         active_rows['Amount of Events'] = active_rows['Amount of Events'] / first_year * 100
 
-    print (active_rows)
+    # Adjust title if normalize is true
+    title = "Events per year"
+    if value2 == "Normalise data":
+        title = "Events per year (normalised to percentage increase/decrease)"
 
-    fig = px.line(active_rows, x="Year", y="Amount of Events", color="Event Type Group", title="Events per year")
+    labels = {
+        "Year": "Years",
+        "Amount of Events": "Amount of events",
+    }
+
+    if value2 == "Normalise data":
+        labels["Amount of Events"] = "Percentage increase/decrease"
+
+    fig = px.line(
+        active_rows,
+        x="Year",
+        y="Amount of Events",
+        color="Event Type Group",
+        title=title,
+        labels=labels,
+    )
 
     # Make fig's y axis start at 0
     max = active_rows['Amount of Events'].max()
-    fig.update_yaxes(range=[0, max * 1.1])
+    min = active_rows['Amount of Events'].min()
+    print(f"Max: {max}, Min: {min}")
+
+    if value2 == "Normalise data":
+        fig.update_yaxes(range=[min * 0.9, max * 1.1])
+    else:
+        fig.update_yaxes(range=[0, max * 1.1])
 
     return fig
 
