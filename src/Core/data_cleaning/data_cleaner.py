@@ -63,7 +63,6 @@ us_state_to_abbrev = {
 
 # invert the dictionary
 abbrev_to_us_state = dict(map(reversed, us_state_to_abbrev.items()))
-abbrev_to_us_state["Unknown"] = "Unknown"
 
 
 def write_cleaned(filepath: str):
@@ -167,20 +166,14 @@ def cap_column(df, column_name, cap):
 
 
 def add_month_column(df: pd.DataFrame):
-    df['Month'] = df["Event Date"].apply(
-        lambda x: x.month_name())
+    for index, row in df.iterrows():
+        df.at[index, 'Month'] = row['Event Date'].month_name()
     return df
 
 
 # This method is dependent on add_state_column
 def add_event_divided_by_citizens(df: pd.DataFrame):
     state_population = pd.read_csv(f"../data/states-population.csv")
-
-    # df['Event Per Mil Citizens'] = df['State'].apply(
-    #     lambda x:
-    #     0 if x == "Unknown" or x == "Puerto Rico" else
-    #     1000000 / state_population.loc[state_population['Years'] == str(x), str(df['Year'])].values[0]
-    # )
 
     for index, row in df.iterrows():
         print(f"index: {index} of {len(df)}")
@@ -200,22 +193,14 @@ def add_state_column(df: pd.DataFrame):
     data['NTD ID'] = agencies['NTD ID']
     data['State'] = agencies['State']
 
-    agencyMap = {}
-
-    for index, row in agencies.iterrows():
-        agencyMap[row['NTD ID']] = row['State']
-
-    df['State'] = df['NTD ID'].apply(
-        lambda x: abbrev_to_us_state[agencyMap.get(x, "Unknown")]
-    )
-    # for index, row in df.iterrows():
-    #     print(f"index: {index} of {len(df)}")
-    #     agency_id = row['NTD ID']
-    #     results = data.loc[data['NTD ID'] == str(agency_id)]
-    #     if len(results) == 0:
-    #         df.at[index, 'State'] = "Unknown"
-    #     else:
-    #         df.at[index, 'State'] = abbrev_to_us_state[results.iloc[0]['State']]
+    for index, row in df.iterrows():
+        print(f"index: {index} of {len(df)}")
+        agency_id = row['NTD ID']
+        results = data.loc[data['NTD ID'] == str(agency_id)]
+        if len(results) == 0:
+            df.at[index, 'State'] = "Unknown"
+        else:
+            df.at[index, 'State'] = abbrev_to_us_state[results.iloc[0]['State']]
 
     # Use df.map instead of the for loop
     # The input value for the key should be converted to string
