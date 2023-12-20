@@ -220,6 +220,7 @@ def update_bar_event_graph(_: Figure) -> Figure:
                       '<b>Amount of events:</b> %{value}<br>' +
                       '<b>Percentage of all events:</b> %{percent}<br>' +
                       '<extra></extra>',
+        textfont_size=14,
     )
 
     fig.update_layout(
