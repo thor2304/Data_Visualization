@@ -1,15 +1,13 @@
-from typing import Tuple
-
 import dash
-import numpy as np
+import dash_bootstrap_components as dbc
 import pandas as pd
-from dash import Dash, html, dcc, callback, Output, Input
-from plotly.graph_objs import Figure
 import plotly.express as px
-import united_states
+from dash import html, dcc, callback, Output, Input
+from plotly.graph_objs import Figure
 
+from src.Core.CustomComponents import GraphDiv
 from src.Core.data_provider import get_df, get_category_orders
-from src.Core.styles import graphStyle, dropdownStyle, pageStyle, graphDivStyle, textStyle, textTitleStyle, labelStyle, \
+from src.Core.styles import graphStyle, pageStyle, graphDivStyle, textStyle, textTitleStyle, labelStyle, \
     legendColors
 
 # The following dicts are used to map the index of the slider to a date.
@@ -43,10 +41,8 @@ dash.register_page(__name__, name="Do more happen every year?")
 
 df = get_df()
 
-# List for Event Graph
-eventsListRaw = df["Event Type Group"].unique()
-eventsList = np.delete(eventsListRaw, np.where(eventsListRaw == "Non-RGX Collision"))
-
+# The different types of events. Used to create the checklist
+eventsList = sorted(df["Event Type Group"].unique())
 layout = html.Div([
     html.H1(children="Is there an increase or decrease in certain types of accidents in the last 9 years?",
             style={'textAlign': 'center', 'padding-bottom': 20, 'padding-top': 50}),
@@ -69,11 +65,7 @@ layout = html.Div([
                     "The event type Security includes events such as bomb threats, hijackings and random gun fire. "
                     "The event type Other includes events such as people falling, people getting sick and people getting lost. ",
            style=textStyle),
-    html.Div([
-        html.H1('', style={'textAlign': 'center '}),
-        dcc.Graph(id='bar-event-graph', style=graphStyle),
-        html.H1('', style={'textAlign': 'center '}),
-    ], style=graphDivStyle),
+    GraphDiv(graph=dcc.Graph(id='bar-event-graph', style=graphStyle)),
 
     # EVENT GRAPH ###################################################################
     html.H3(children="Events per year", style=textTitleStyle),
@@ -86,26 +78,32 @@ layout = html.Div([
                     "the data can be normalised. "
                     "Normalising the data means that the different Event Types are indexed to the first year. ",
            style=textStyle),
-    html.Div([
-        html.Div([
-            html.H3(children="Choose event type", style={'textAlign': 'center'}),
-            dcc.Checklist(
-                id="event-checklist",
-                options=[{'label': html.Span(i, style={'padding-left': 10}), 'value': i} for i in eventsList],
-                value=eventsList,
-                inline=False,
-                labelStyle={'display': 'flex', 'align-items': 'center'},
-            ),
-            html.H3(children="Choose whether to normalise data", style={'textAlign': 'center', 'padding-top': 20}),
-            dcc.RadioItems(
-                id='event-normaliser',
-                options=["Normalise data", "Don't normalise data"],
-                value="Don't normalise data",
-                labelStyle={'display': 'flex'}),
-        ], style={'width': '60%', 'margin': 'auto', 'height': '100%'}),
-        dcc.Graph(id='event-graph', style=graphStyle),
-        html.H1('', style={'textAlign': 'center '}),
-    ], style=graphDivStyle),
+    GraphDiv(
+        left_of_graph=[dbc.Form([
+                html.H3(children="Choose event types", style={'textAlign': 'center'}),
+                html.Div(
+                    dbc.Checklist(
+                        options=eventsList,
+                        value=eventsList,
+                        switch=True,
+                        id="event-checklist",
+                    ),
+                    className="py-2",
+                ),
+                html.H3(children="Choose whether to normalise data",
+                        style={'textAlign': 'center', 'padding-top': 20}),
+                html.P(children="Relative to the accidents in 2014"),
+                html.Div(
+                    dbc.RadioItems(
+                        options=["Don't normalise data", "Normalise data", ],
+                        value="Don't normalise data",
+                        id="event-normaliser",
+                    ),
+                    className="py-2",
+                )])],
+        graph=dcc.Graph(id='event-graph', style=graphStyle),
+        # right_of_graph=[html.H1('', style={'textAlign': 'center '})]
+    ),
 
     # HORIZONTAL BAR GRAPH #########################################################
     html.H3(children="Horizontal bar graph", style=textTitleStyle),
@@ -119,9 +117,8 @@ layout = html.Div([
                     "which in return will be visualized in the graph.",
            style={'width': '40%', 'padding-bottom': 20}),
 
-    html.Div([
-        html.H1('', style={'textAlign': 'center '}),
-        html.Div([
+    GraphDiv(
+        graph=html.Div([
             dcc.RangeSlider(
                 min=0,
                 max=9 * 12 - 1,  # - 1 because the index starts at 0
@@ -135,11 +132,11 @@ layout = html.Div([
                 id='horizontal-bar-graph-slider',
             ),
             dcc.Graph(id='horizontal-bar-graph', style=graphStyle),
-            html.H1('', style={'textAlign': 'center '}),
         ]),
-    ], style=graphDivStyle),
+    )
 
 ], style=pageStyle)
+
 
 
 # EVENT GRAPH #################################################################
@@ -198,9 +195,9 @@ def update_event_graph(value: str, value2: str) -> Figure:
 # BAR GRAPH #################################################################
 @callback(
     Output('bar-event-graph', 'figure'),
-    Input('bar-event-graph', 'figure')
+    Input('bar-event-graph', 'style')
 )
-def update_bar_event_graph(_: str) -> Figure:
+def update_bar_event_graph(_: Figure) -> Figure:
     fig = px.histogram(df, x="Event Type Group", color="Event Type Group", category_orders=get_category_orders(),
                        color_discrete_sequence=legendColors)
 

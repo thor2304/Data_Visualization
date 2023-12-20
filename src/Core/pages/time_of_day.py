@@ -20,7 +20,8 @@ layout = html.Div([
     html.Div([
         html.Div([
             html.H3(children="Choose Y-axis", style={'textAlign': 'center'}),
-            dcc.Dropdown(["Total Injuries", "Number of accidents"], 'Total Injuries', id='type-dropdown-selection',
+            dcc.Dropdown(["Total Injuries", "Number of accidents", "Total Fatalities"], 'Total Injuries',
+                         id='type-dropdown-selection',
                          style={'width': '100%', 'justify-content': 'end'},
                          clearable=False),
         ], style={'width': '60%', 'margin': 'auto', 'height': '100%'}),
