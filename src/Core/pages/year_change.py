@@ -46,6 +46,9 @@ df = get_df()
 # List for Event Graph
 eventsListRaw = df["Event Type Group"].unique()
 eventsList = np.delete(eventsListRaw, np.where(eventsListRaw == "Non-RGX Collision"))
+# statesList without Unknown
+statesListRaw = df["State"].unique()
+statesList = np.delete(statesListRaw, np.where(statesListRaw == "Unknown"))
 
 layout = html.Div([
     html.H1(children="Is there an increase or decrease in certain types of accidents in the last 9 years?",
@@ -104,6 +107,34 @@ layout = html.Div([
                 labelStyle={'display': 'flex'}),
         ], style={'width': '60%', 'margin': 'auto', 'height': '100%'}),
         dcc.Graph(id='event-graph', style=graphStyle),
+        html.H1('', style={'textAlign': 'center '}),
+    ], style=graphDivStyle),
+
+    # LINE CHART WITH STATES #########################################################
+    html.H3(children="Events per state", style=textTitleStyle),
+    html.P(children="The following horizontal bar graph shows the amount of events per state for a specific year or a range of years. ",
+            style=textStyle),
+    html.Div([
+        html.Div([
+            html.H3(children="Choose event type", style={'textAlign': 'center'}),
+            dcc.Dropdown(eventsList, eventsList[0], id='state-line-chart-event-selection',
+                         style={'width': '100%', 'justify-content': 'end'}, clearable=False),
+            html.H3(children="Choose states", style={'textAlign': 'center'}),
+            dcc.Checklist(
+                id="state-line-chart-state-selection",
+                options=[{'label': html.Span(i, style={'padding-left': 10}), 'value': i} for i in statesList],
+                value=[statesList[0]],
+                inline=False,
+                labelStyle={'display': 'flex', 'align-items': 'center'},
+            ),
+            html.H3(children="Choose whether to normalise data", style={'textAlign': 'center', 'padding-top': 20}),
+            dcc.RadioItems(
+                id='state-line-chart-normaliser',
+                options=["Normalise data", "Don't normalise data"],
+                value="Don't normalise data",
+                labelStyle={'display': 'flex'}),
+        ], style={'width': '60%', 'margin': 'auto', 'height': '100%'}),
+        dcc.Graph(id='state-line-chart', style=graphStyle),
         html.H1('', style={'textAlign': 'center '}),
     ], style=graphDivStyle),
 
@@ -211,6 +242,64 @@ def update_bar_event_graph(_: str) -> Figure:
     )
 
     return fig
+
+# LINE CHART WITH STATES #########################################################
+@callback(
+    Output('state-line-chart', 'figure'),
+    Input('state-line-chart-event-selection', 'value'),
+    Input('state-line-chart-state-selection', 'value'),
+    Input('state-line-chart-normaliser', 'value')
+)
+def update_state_line_chart(event_type: str, states_selected, normalise: str) -> Figure:
+    labels = {
+        "Year": "Years",
+        "Amount of Events": "Amount of events",
+    }
+
+    # Mask to get active rows dependendt on input value
+    mask = df['Event Type Group'] == event_type
+    active_rows = df[mask]
+
+    # Get amount of events per year in the different states, which are selected
+    active_rows = active_rows[active_rows['State'].isin(states_selected)]
+
+    # Get amount of events per year per event type
+    active_rows = active_rows.groupby(['Year', 'State']).size().reset_index(name='Amount of Events')
+
+    # If normalise is true the data should visualize how much each event type increases/decreases each year
+    # Each event type should be indexed to the first year. This means that the first year should be 100%
+    # Then next year should be divided by the first year and multiplied by 100 to get the percentage increase/decrease
+    if normalise == "Normalise data":
+        labels["Amount of Events"] = "Percentage increase/decrease"
+
+        # Get the first year for each event type
+        first_year = active_rows.groupby(['State'])['Amount of Events'].transform('first')
+
+        # Divide the amount of events for each year by the first year and multiply by 100
+        active_rows['Amount of Events'] = active_rows['Amount of Events'] / first_year * 100
+
+    # Color everything in light grey
+    fig = px.line(
+        active_rows,
+        x="Year",
+        y="Amount of Events",
+        labels=labels,
+        color="State",
+        color_discrete_sequence=['lightgrey'] * len(states_selected)
+    )
+
+    if normalise == "Normalise data":
+        fig.update_yaxes(ticksuffix="%")
+    else:
+        fig.update_yaxes(autorangeoptions_include=[0])
+
+    fig.update_layout(
+        hoverlabel=labelStyle,
+    )
+
+    return fig
+
+
 
 
 ## Horizontal bar graph
