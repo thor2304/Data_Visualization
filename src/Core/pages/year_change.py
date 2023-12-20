@@ -46,6 +46,7 @@ eventsList = sorted(df["Event Type Group"].unique())
 # statesList without Unknown
 statesListRaw = df["State"].unique()
 statesList = np.delete(statesListRaw, np.where(statesListRaw == "Unknown"))
+
 layout = html.Div([
     html.H1(children="Is there an increase or decrease in certain types of accidents in the last 9 years?",
             style={'textAlign': 'center', 'padding-bottom': 20, 'padding-top': 50}),
@@ -250,9 +251,6 @@ def update_state_line_chart(event_type: str, states_selected1, states_selected2,
     # Get amount of events per year per event type
     active_rows = active_rows.groupby(['Year', 'State']).size().reset_index(name='Amount of Events')
 
-    # If normalise is true the data should visualize how much each event type increases/decreases each year
-    # Each event type should be indexed to the first year. This means that the first year should be 100%
-    # Then next year should be divided by the first year and multiplied by 100 to get the percentage increase/decrease
     if normalise == "Normalise data":
         labels["Amount of Events"] = "Percentage increase/decrease"
 
@@ -292,7 +290,7 @@ def update_state_line_chart(event_type: str, states_selected1, states_selected2,
     return fig
 
 
-## Horizontal bar graph
+# Horizontal bar graph #########################################################
 @callback(
     Output('horizontal-bar-graph', 'figure'),
     Input('horizontal-bar-graph-slider', 'value')
