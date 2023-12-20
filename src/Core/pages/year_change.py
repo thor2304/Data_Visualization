@@ -115,7 +115,7 @@ layout = html.Div([
             html.H3(children="Choose states", style={'textAlign': 'center'}),
             dcc.Checklist(
                 id="state-line-chart-state-selection",
-                options=[{'label': html.Span(i, style={'padding-left': 10}), 'value': i} for i in statesList],
+                options=[{'label': html.Span(i, style={'padding-left': 10}), 'value': i} for i in statesList[:len(statesList)//2]],
                 value=[statesList[0]],
                 inline=False,
                 labelStyle={'display': 'flex', 'align-items': 'center'},
@@ -127,7 +127,18 @@ layout = html.Div([
                 value="Don't normalise data",
                 labelStyle={'display': 'flex'}),
         ],
-        graph=dcc.Graph(id='state-line-chart', style=graphStyle)
+        graph=dcc.Graph(id='state-line-chart', style=graphStyle),
+        right_of_graph=[
+            html.H3(children="Choose states", style={'textAlign': 'center'}),
+            dcc.Checklist(
+                id="state-line-chart-state-selection2",
+                options=[{'label': html.Span(i, style={'padding-left': 10}), 'value': i} for i in statesList[len(statesList)//2:]],
+                value=[],
+                inline=False,
+                labelStyle={'display': 'flex', 'align-items': 'center'},
+            ),
+        ]
+
     ),
 
     # HORIZONTAL BAR GRAPH #########################################################
@@ -238,13 +249,16 @@ def update_bar_event_graph(_: Figure) -> Figure:
     Output('state-line-chart', 'figure'),
     Input('state-line-chart-event-selection', 'value'),
     Input('state-line-chart-state-selection', 'value'),
+    Input('state-line-chart-state-selection2', 'value'),
     Input('state-line-chart-normaliser', 'value')
 )
-def update_state_line_chart(event_type: str, states_selected, normalise: str) -> Figure:
+def update_state_line_chart(event_type: str, states_selected1, states_selected2, normalise: str) -> Figure:
     labels = {
         "Year": "Years",
         "Amount of Events": "Amount of events",
     }
+
+    states_selected = states_selected1 + states_selected2
 
     # Mask to get active rows dependendt on input value
     mask = df['Event Type Group'] == event_type
@@ -269,19 +283,28 @@ def update_state_line_chart(event_type: str, states_selected, normalise: str) ->
         active_rows['Amount of Events'] = active_rows['Amount of Events'] / first_year * 100
 
     # Color everything in light grey
+    # Color the hovered line in grey
     fig = px.line(
         active_rows,
         x="Year",
         y="Amount of Events",
         labels=labels,
+        color_discrete_sequence=['lightgrey'],
+        hover_data={'Amount of Events': False},
         color="State",
-        color_discrete_sequence=['lightgrey'] * len(states_selected)
     )
 
     if normalise == "Normalise data":
         fig.update_yaxes(ticksuffix="%")
     else:
         fig.update_yaxes(autorangeoptions_include=[0])
+
+    fig.update_traces(
+        hovertemplate='<b>%{data.name}</b><br>' +
+                      '<b>' + labels["Amount of Events"] + ':</b> %{y}<br>' +
+                      '<b>Year:</b> %{x}<br>' +
+                      '<extra></extra>',
+    )
 
     fig.update_layout(
         hoverlabel=labelStyle,
