@@ -5,7 +5,7 @@ import plotly.express as px
 import numpy as np
 import dash_bootstrap_components as dbc
 
-from src.Core.CustomComponents import GraphDiv
+from src.Core.CustomComponents import GraphDiv, CheckList
 from src.Core.data_provider import get_df, get_category_orders
 from src.Core.styles import graphDivStyle, pageStyle, graphStyle, legendColors
 
@@ -19,23 +19,13 @@ layout = html.Div([
             style={'textAlign': 'center', 'width': '60%'}),
     GraphDiv(
         left_of_graph=[
-            dbc.Form([
-                html.H3(children="Choose Y-axis", style={'textAlign': 'center'}),
-                dcc.Dropdown(["Total Injuries", "Number of accidents", "Total Fatalities"], 'Total Injuries',
-                             id='type-dropdown-selection',
-                             style={'width': '100%', 'justify-content': 'end'},
-                             clearable=False),
-                html.H3(children="Choose event types", style={'textAlign': 'center', "margin-top": "2em"}),
-                html.Div(
-                    dbc.Checklist(
-                        options=eventsList,
-                        value=eventsList,
-                        switch=True,
-                        id="event-checklist",
-                    ),
-                    className="py-2",
-                ),
-            ]),
+            html.H3(children="Choose Y-axis", style={'textAlign': 'center'}),
+            dcc.Dropdown(["Total Injuries", "Number of accidents", "Total Fatalities"], 'Total Injuries',
+                         id='type-dropdown-selection',
+                         style={'width': '100%', 'justify-content': 'end'},
+                         clearable=False),
+            CheckList(title="Choose event types", options=eventsList, checklist_id="event-checklist"),
+
         ],
         graph=dcc.Graph(id='time-graph', style=graphStyle),
     ),
@@ -46,28 +36,16 @@ layout = html.Div([
         "The data is summed up from the years 2014-2022"),
     GraphDiv(
         left_of_graph=[
-            dbc.Form([
-                html.H3(children="Choose Y-axis", style={'textAlign': 'center'}),
-                dcc.Dropdown(["Total Injuries", "Number of accidents", "Total Fatalities"], 'Total Injuries',
-                             id='type-dropdown-selection-animated',
-                             style={'width': '100%', 'justify-content': 'end'},
-                             clearable=False),
-                html.H3(children="Choose event types", style={'textAlign': 'center', "margin-top": "2em"}),
-                html.Div(
-                    dbc.Checklist(
-                        options=eventsList,
-                        value=eventsList,
-                        switch=True,
-                        id="event-checklist-animated",
-                    ),
-                    className="py-2",
-                ),
-            ]),
+            html.H3(children="Choose Y-axis", style={'textAlign': 'center'}),
+            dcc.Dropdown(["Total Injuries", "Number of accidents", "Total Fatalities"], 'Total Injuries',
+                         id='type-dropdown-selection-animated',
+                         style={'width': '100%', 'justify-content': 'end'},
+                         clearable=False),
+            CheckList(title="Choose event types", options=eventsList, checklist_id="event-checklist-animated"),
         ],
         graph=dcc.Graph(id='time-graph-animated', style=graphStyle),
     )
 ], style=pageStyle)
-
 
 
 @callback(
