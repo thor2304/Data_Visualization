@@ -12,3 +12,5 @@ labelStyle = dict(
 )
 
 legendColors = ['#FFAB66', '#1A6EB3', '#EDABE3', '#CF4FE8', '#BEECF4', '#22AEC3', '#9F92C8']
+# import plotly.express as px
+# legendColors = px.colors.qualitative.D3
