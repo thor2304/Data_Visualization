@@ -23,9 +23,10 @@ layout = html.Div([
         left_of_graph=[
             dbc.Form([
                 CheckList(title="Choose event types", options=eventsList, checklist_id="map-event-checklist"),
-                html.H3(children="f",
+                html.H3(children="Adjust amount of hexagons",
                         style={'textAlign': 'center', 'padding-top': 20}),
-                html.P(children="XXXXX"),
+                html.P(children="Adjusting the amount of hexagons to an amount higher than 200 can take time to load."),
+                html.P(children="Additionally, the hexagons can be hard too see, so zooming in is recommended."),
                 html.Div(
                     dbc.RadioItems(
                         options=[10, 20, 30, 40, 50, 200, 1000, 3000, 5000, 10000],
