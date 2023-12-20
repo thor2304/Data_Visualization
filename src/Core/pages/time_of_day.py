@@ -60,12 +60,42 @@ def time_of_day(y_selection: str, selected_event_types: list[str]) -> Figure:
     active_rows = df[mask]
     sorted_df = active_rows.sort_values("Event Date", ascending=True)
 
-    fig = px.histogram(sorted_df, x="Hour", y=y_selection, color='Event Type Group', orientation='v',
-                       category_orders=get_category_orders(),
-                       color_discrete_sequence=legendColors,
-                       )
+    grouped_df = sorted_df.groupby(["Event Type Group", "Hour", "Month"], as_index=False).agg({y_selection: sum})
+    grouped_df = grouped_df.sort_values("Month", ascending=True)
+    #
+    # fig = px.histogram(sorted_df, x="Hour", y=y_selection, color='Event Type Group', orientation='v',
+    #                    category_orders=get_category_orders(),
+    #                    color_discrete_sequence=legendColors,
+    #                    )
+
+    fig = px.bar(grouped_df, x="Hour", y=y_selection, color='Event Type Group',
+                 category_orders=get_category_orders(),
+                 color_discrete_sequence=legendColors,
+                 animation_frame="Month",
+                 animation_group="Hour",
+                 )
 
     return treat_histogram_fig(fig, y_selection)
+
+
+# @callback(
+#     Output('time-graph', 'figure'),
+#     Input('type-dropdown-selection', 'value'),
+#     Input('event-checklist', 'value'),
+# )
+# def time_of_day(y_selection: str, selected_event_types: list[str]) -> Figure:
+#     # Hover could be solved by adding another column, that is Hour.dt.time, and then show that.
+#
+#     mask = df['Event Type Group'].isin(selected_event_types)
+#     active_rows = df[mask]
+#     sorted_df = active_rows.sort_values("Event Date", ascending=True)
+#
+#     fig = px.histogram(sorted_df, x="Hour", y=y_selection, color='Event Type Group', orientation='v',
+#                        category_orders=get_category_orders(),
+#                        color_discrete_sequence=legendColors,
+#                        )
+#
+#     return treat_histogram_fig(fig, y_selection)
 
 
 @callback(
@@ -104,13 +134,16 @@ def treat_histogram_fig(fig: Figure, y_selection: str) -> Figure:
                     '<extra></extra>'
     texttemplate = '%{y}'
     fig.update_traces(
-        texttemplate=texttemplate,
+        # texttemplate=texttemplate,
         hovertemplate=hovertemplate,
     )
 
     for f in fig.frames:
         for trace in f.data:
-            trace.update(hovertemplate=hovertemplate, texttemplate=texttemplate)
+            trace.update(
+                hovertemplate=hovertemplate,
+                # texttemplate=texttemplate
+            )
 
     fig.update_xaxes(
         title_text="Time of day",
