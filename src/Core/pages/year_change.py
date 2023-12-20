@@ -327,10 +327,7 @@ def update_horizontal_bar_graph(value) -> Figure:
                        height=1200,
                        title="Years chosen by slider " + inputMarks[value[0]] + " to " + inputMarks[value[1]],
                        category_orders=get_category_orders(),
-                       color_discrete_sequence=legendColors,
-                       hover_data=active_rows
-
-                       )
+                       color_discrete_sequence=legendColors)
 
     # Sort in descending order
     fig.update_yaxes(
