@@ -139,8 +139,11 @@ def main():
 
     df = df[df['Event Type Group'] != "Non-RGX Collision"]
 
-    # Drop rows where latitude is above 90 or below -90
+    # Drop rows where latitude is above 90
     df = df[df['Latitude'] < 90]
+
+    # Drop rows where longitude is above -45
+    df = df[df['Longitude'] < -45]
 
     df = cap_column(df, "Vehicle Speed", 200)
 

@@ -6,7 +6,7 @@ import plotly.express as px
 import plotly.figure_factory as ff
 import dash_bootstrap_components as dbc
 
-from src.Core.CustomComponents import GraphDiv
+from src.Core.CustomComponents import GraphDiv, CheckList
 from src.Core.data_provider import get_df
 from src.Core.styles import graphStyle, dropdownStyle, legendColors
 
@@ -14,12 +14,15 @@ dash.register_page(__name__, name="Where do accidents happen?")
 
 df = get_df()
 
+eventsList = sorted(df["Event Type Group"].unique())
+
 layout = html.Div([
-    html.H1('Is there a relation between time periods in the day and certain types of accidents?',
+    html.H1('Do certain types of accidents occur more often in certain environments?',
                 style={'textAlign': 'center'}),
     GraphDiv(
         left_of_graph=[
             dbc.Form([
+                CheckList(title="Choose event types", options=eventsList, checklist_id="map-event-checklist"),
                 html.H3(children="f",
                         style={'textAlign': 'center', 'padding-top': 20}),
                 html.P(children="XXXXX"),
@@ -39,9 +42,13 @@ layout = html.Div([
 
 @callback(
     Output('accident-map', 'figure'),
-    Input('hexagon-size', 'value')
+    Input('hexagon-size', 'value'),
+    Input('map-event-checklist', 'value')
 )
-def update_map(value: int) -> Figure:
+def update_map(value: int, event_type: str) -> Figure:
+
+    mask = df['Event Type Group'].isin(event_type)
+    active_rows = df[mask]
 
     min_count = 0
     opacity_value = 0.2
@@ -51,7 +58,7 @@ def update_map(value: int) -> Figure:
         opacity_value = 0.5
 
     fig = ff.create_hexbin_mapbox(
-        data_frame=df,
+        data_frame=active_rows,
         lat="Latitude",
         lon="Longitude",
         nx_hexagon=value,
@@ -62,12 +69,12 @@ def update_map(value: int) -> Figure:
         mapbox_style="open-street-map",
         min_count=min_count,
         agg_func=np.sum,
-        zoom=3.5,
-        center=dict(lat=38.92, lon=-99.07),
+        zoom=3.7,
+        center=dict(lat=38.92, lon=-96),
         range_color=[0, 200],
 
     )
 
-    
+
 
     return fig
