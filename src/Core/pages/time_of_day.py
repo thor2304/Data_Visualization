@@ -86,19 +86,6 @@ def animated_time_of_day(y_selection: str, selected_event_types: list[str]) -> F
         "Number of accidents": 600,
         "Total Fatalities": 25,
     }
-
-    grouped_df = sorted_df.groupby(["Event Type Group", "Hour", "Month"], as_index=False).agg({y_selection: sum})
-    grouped_df = grouped_df.sort_values("Month", ascending=True)
-
-    fig = px.bar(grouped_df, x="Hour", y=y_selection, color='Event Type Group',
-                 category_orders=get_reverse_category_orders(),
-                 color_discrete_sequence=list(
-                     reversed(legendColors[0:len(get_reverse_category_orders()["Event Type Group"])])),
-                 animation_frame="Month",
-                 animation_group="Hour",
-                 range_y=[0, max_Ranges[y_selection]],
-                 )
-
     months = {
         "January": 1,
         "February": 2,
@@ -114,13 +101,22 @@ def animated_time_of_day(y_selection: str, selected_event_types: list[str]) -> F
         "December": 12,
     }
 
-    sorted_frames = list(fig.frames)
-    sorted_frames.sort(key=lambda x: months[x.name])
-    fig.frames = tuple(sorted_frames)
+    months_number_to_name = {v: k for k, v in months.items()}
 
-    sorted_steps = list(fig.layout.sliders[0].steps)
-    sorted_steps.sort(key=lambda x: months[x.args[0][0]])
-    fig.layout.sliders[0].steps = sorted_steps
+    grouped_df = sorted_df.groupby(["Event Type Group", "Hour", "Month"], as_index=False).agg({y_selection: "sum"})
+
+    # Reorder the rows so that the months are in the correct order
+    grouped_df["Month number"] = grouped_df["Month"].apply(lambda x: months[x])
+    grouped_df = grouped_df.sort_values("Month number", ascending=True)
+
+    fig = px.bar(grouped_df, x="Hour", y=y_selection, color='Event Type Group',
+                 category_orders=get_reverse_category_orders(),
+                 color_discrete_sequence=list(
+                     reversed(legendColors[0:len(get_reverse_category_orders()["Event Type Group"])])),
+                 animation_frame="Month",
+                 animation_group="Hour",
+                 range_y=[0, max_Ranges[y_selection]],
+                 )
 
     return treat_histogram_fig(fig, y_selection)
 
