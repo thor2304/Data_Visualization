@@ -145,7 +145,7 @@ layout = html.Div([
     Input('event-checklist', 'value'),
     Input('event-normaliser', 'value')
 )
-def update_event_graph(value: str, value2: str) -> Figure:
+def update_event_graph(value: list[str], value2: str) -> Figure:
     labels = {
         "Year": "Years",
         "Amount of Events": "Amount of events",

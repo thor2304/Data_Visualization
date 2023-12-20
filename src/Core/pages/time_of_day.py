@@ -3,7 +3,9 @@ from dash import Dash, html, dcc, callback, Output, Input
 from plotly.graph_objs import Figure
 import plotly.express as px
 import numpy as np
+import dash_bootstrap_components as dbc
 
+from src.Core.CustomComponents import GraphDiv
 from src.Core.data_provider import get_df, get_category_orders
 from src.Core.styles import graphDivStyle, pageStyle, graphStyle, legendColors
 
@@ -11,46 +13,126 @@ dash.register_page(__name__, name="When does injuries happen?")
 
 df = get_df()
 
-eventsListRaw = df["Event Type Group"].unique()
-eventsList = np.delete(eventsListRaw, np.where(eventsListRaw == "Non-RGX Collision"))
-
+eventsList = sorted(df["Event Type Group"].unique())
 layout = html.Div([
     html.H1('Is there a relation between time periods in the day and certain types of accidents?',
             style={'textAlign': 'center', 'width': '60%'}),
-    html.Div([
-        html.Div([
-            html.H3(children="Choose Y-axis", style={'textAlign': 'center'}),
-            dcc.Dropdown(["Total Injuries", "Number of accidents", "Total Fatalities"], 'Total Injuries',
-                         id='type-dropdown-selection',
-                         style={'width': '100%', 'justify-content': 'end'},
-                         clearable=False),
-        ], style={'width': '60%', 'margin': 'auto', 'height': '100%'}),
-        dcc.Graph(id='time-graph', style=graphStyle),
-        html.H4('Remove event types by clicking the legend', style={'textAlign': 'center '}),
-    ], style=graphDivStyle),
+    GraphDiv(
+        left_of_graph=[
+            dbc.Form([
+                html.H3(children="Choose Y-axis", style={'textAlign': 'center'}),
+                dcc.Dropdown(["Total Injuries", "Number of accidents", "Total Fatalities"], 'Total Injuries',
+                             id='type-dropdown-selection',
+                             style={'width': '100%', 'justify-content': 'end'},
+                             clearable=False),
+                html.H3(children="Choose event types", style={'textAlign': 'center', "margin-top": "2em"}),
+                html.Div(
+                    dbc.Checklist(
+                        options=eventsList,
+                        value=eventsList,
+                        switch=True,
+                        id="event-checklist",
+                    ),
+                    className="py-2",
+                ),
+            ]),
+        ],
+        graph=dcc.Graph(id='time-graph', style=graphStyle),
+    ),
+    html.H1('How does this change over the course of a year?',
+            style={'textAlign': 'center', 'width': '60%'}),
+    html.P(
+        "The following graph shows the number of accidents per month, for each event type group. "
+        "The data is summed up from the years 2014-2022"),
+    GraphDiv(
+        left_of_graph=[
+            dbc.Form([
+                html.H3(children="Choose Y-axis", style={'textAlign': 'center'}),
+                dcc.Dropdown(["Total Injuries", "Number of accidents", "Total Fatalities"], 'Total Injuries',
+                             id='type-dropdown-selection-animated',
+                             style={'width': '100%', 'justify-content': 'end'},
+                             clearable=False),
+                html.H3(children="Choose event types", style={'textAlign': 'center', "margin-top": "2em"}),
+                html.Div(
+                    dbc.Checklist(
+                        options=eventsList,
+                        value=eventsList,
+                        switch=True,
+                        id="event-checklist-animated",
+                    ),
+                    className="py-2",
+                ),
+            ]),
+        ],
+        graph=dcc.Graph(id='time-graph-animated', style=graphStyle),
+    )
 ], style=pageStyle)
+
 
 
 @callback(
     Output('time-graph', 'figure'),
-    Input('type-dropdown-selection', 'value')
+    Input('type-dropdown-selection', 'value'),
+    Input('event-checklist', 'value'),
 )
-def update_3d_plot(y_selection: str) -> Figure:
+def time_of_day(y_selection: str, selected_event_types: list[str]) -> Figure:
     # Hover could be solved by adding another column, that is Hour.dt.time, and then show that.
-    fig = px.histogram(df, x="Hour", y=y_selection, color='Event Type Group', orientation='v',
+
+    mask = df['Event Type Group'].isin(selected_event_types)
+    active_rows = df[mask]
+    sorted_df = active_rows.sort_values("Event Date", ascending=True)
+
+    fig = px.histogram(sorted_df, x="Hour", y=y_selection, color='Event Type Group', orientation='v',
                        category_orders=get_category_orders(),
                        color_discrete_sequence=legendColors,
-                       # height=800,
+                       )
+
+    return treat_histogram_fig(fig, y_selection)
+
+
+@callback(
+    Output('time-graph-animated', 'figure'),
+    Input('type-dropdown-selection-animated', 'value'),
+    Input('event-checklist-animated', 'value'),
+)
+def animated_time_of_day(y_selection: str, selected_event_types: list[str]) -> Figure:
+    # Hover could be solved by adding another column, that is Hour.dt.time, and then show that.
+    max_Ranges = {
+        "Total Injuries": 700,
+        "Number of accidents": 600,
+        "Total Fatalities": 25,
+    }
+
+    mask = df['Event Type Group'].isin(selected_event_types)
+    active_rows = df[mask]
+    sorted_df = active_rows.sort_values("Event Date", ascending=True)
+
+    fig = px.histogram(sorted_df, x="Hour", y=y_selection, color='Event Type Group', orientation='v',
+                       category_orders=get_category_orders(),
+                       color_discrete_sequence=legendColors,
+                       animation_frame="Month",
+                       # animation_group="Event Type Group",
+                       range_y=[0, max_Ranges[y_selection]],
                        # title="Number of accidents per hour of the day"
                        )
 
+    return treat_histogram_fig(fig, y_selection)
+
+
+def treat_histogram_fig(fig: Figure, y_selection: str) -> Figure:
+    hovertemplate = '<b>%{data.name}</b><br>' + \
+                    '<b>' + y_selection + ':</b> %{y}<br>' + \
+                    '<b>Time:</b> %{x}<br>' + \
+                    '<extra></extra>'
+    texttemplate = '%{y}'
     fig.update_traces(
-        texttemplate='%{y}',
-        hovertemplate='<b>%{data.name}</b><br>' +
-                      '<b>' + y_selection + ':</b> %{y}<br>' +
-                      '<b>Time:</b> %{x}<br>' +
-                      '<extra></extra>',
+        texttemplate=texttemplate,
+        hovertemplate=hovertemplate,
     )
+
+    for f in fig.frames:
+        for trace in f.data:
+            trace.update(hovertemplate=hovertemplate, texttemplate=texttemplate)
 
     fig.update_xaxes(
         title_text="Time of day",
