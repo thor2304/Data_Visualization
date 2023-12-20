@@ -1,3 +1,5 @@
+import trace
+
 import dash
 import dash_bootstrap_components as dbc
 import pandas as pd
@@ -185,8 +187,19 @@ def update_event_graph(value: str, value2: str) -> Figure:
     else:
         fig.update_yaxes(autorangeoptions_include=[0])
 
+    # Hover settings for the graph
+    fig.update_traces(
+        mode='lines+markers',
+        line=dict(width=3),
+        marker=dict(size=7),
+        hovertemplate='<b>%{data.name}:</b> %{y}<br>' +
+                      '<extra></extra>',
+    )
+
     fig.update_layout(
         hoverlabel=labelStyle,
+        hoverdistance=20,
+        hovermode='x unified',
     )
 
     return fig
@@ -198,13 +211,20 @@ def update_event_graph(value: str, value2: str) -> Figure:
     Input('bar-event-graph', 'style')
 )
 def update_bar_event_graph(_: Figure) -> Figure:
-    fig = px.histogram(df, x="Event Type Group", color="Event Type Group", category_orders=get_category_orders(),
-                       color_discrete_sequence=legendColors)
+    fig = px.pie(df, names="Event Type Group", color="Event Type Group", category_orders=get_category_orders(),
+                 color_discrete_sequence=legendColors, hole=0.65)
 
-    # sort in descending order
-    fig.update_xaxes(
-        categoryorder="total descending",
-        title_text="Event Type Group"
+    # Hover settings for the graph
+    fig.update_traces(
+        hovertemplate='<b>%{label}</b><br>' +
+                      '<b>Amount of events:</b> %{value}<br>' +
+                      '<b>Percentage of all events:</b> %{percent}<br>' +
+                      '<extra></extra>',
+        textfont_size=14,
+    )
+
+    fig.update_layout(
+        hoverlabel=labelStyle,
     )
 
     return fig
@@ -252,6 +272,18 @@ def update_horizontal_bar_graph(value) -> Figure:
     fig.update_yaxes(
         categoryorder="total ascending",
         title_text="States"
+    )
+
+    # Hover settings for the graph
+    fig.update_traces(
+        hovertemplate='<b>%{data.name}</b><br>' +
+                      '<b>Event Per Mil Citizens: %{x:.2f}</b><br>' +
+                      '<extra></extra>',
+    )
+
+    fig.update_layout(
+        hovermode='y unified',
+        bargap=0.3,
     )
 
     return fig
