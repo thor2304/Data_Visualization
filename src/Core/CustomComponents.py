@@ -17,10 +17,11 @@ def GraphDiv(left_of_graph: list = None, graph: dcc.Graph | html.Div = None, rig
         html.Div(right_of_graph, style=side_style),
     ], style=graphDivStyle)
 
+
 def CheckList(title: str, options: list[str], checklist_id: str, only_select_first: bool = False) -> dbc.Form:
     return dbc.Form([
         html.Div(
-            [html.H3(children=title, style={'textAlign': 'center', "margin-top": "2em"}),
+            [html.H3(children=title, style={'textAlign': 'center'}),
              dbc.Checklist(
                  options=options,
                  value=[options[0]] if only_select_first else options,

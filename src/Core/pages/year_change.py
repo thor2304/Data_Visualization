@@ -1,11 +1,12 @@
 import dash
 import numpy as np
 import pandas as pd
+import dash_bootstrap_components as dbc
 import plotly.express as px
 from dash import html, dcc, callback, Output, Input
 from plotly.graph_objs import Figure
 
-from src.Core.CustomComponents import GraphDiv
+from src.Core.CustomComponents import GraphDiv, CheckList
 from src.Core.data_provider import get_df, get_category_orders
 from src.Core.styles import graphStyle, pageStyle, textStyle, textTitleStyle, labelStyle, legendColors
 
@@ -45,7 +46,6 @@ eventsList = sorted(df["Event Type Group"].unique())
 # statesList without Unknown
 statesListRaw = df["State"].unique()
 statesList = np.delete(statesListRaw, np.where(statesListRaw == "Unknown"))
-
 layout = html.Div([
     html.H1(children="Is there an increase or decrease in certain types of accidents in the last 9 years?",
             style={'textAlign': 'center', 'padding-bottom': 20, 'padding-top': 50}),
@@ -83,14 +83,7 @@ layout = html.Div([
            style=textStyle),
     GraphDiv(
         left_of_graph=[
-            html.H3(children="Choose event type", style={'textAlign': 'center'}),
-            dcc.Checklist(
-                id="event-checklist",
-                options=[{'label': html.Span(i, style={'padding-left': 10}), 'value': i} for i in eventsList],
-                value=eventsList,
-                inline=False,
-                labelStyle={'display': 'flex', 'align-items': 'center'},
-            ),
+            CheckList("Choose event type", eventsList, 'event-checklist'),
             html.H3(children="Choose whether to normalise data", style={'textAlign': 'center', 'padding-top': 20}),
             dcc.RadioItems(
                 id='event-normaliser',
@@ -111,33 +104,20 @@ layout = html.Div([
         left_of_graph=[
             html.H3(children="Choose event type", style={'textAlign': 'center'}),
             dcc.Dropdown(eventsList, eventsList[0], id='state-line-chart-event-selection',
-                         style={'width': '100%', 'justify-content': 'end'}, clearable=False),
-            html.H3(children="Choose states", style={'textAlign': 'center'}),
-            dcc.Checklist(
-                id="state-line-chart-state-selection",
-                options=[{'label': html.Span(i, style={'padding-left': 10}), 'value': i} for i in statesList[:len(statesList)//2]],
-                value=[statesList[0]],
-                inline=False,
-                labelStyle={'display': 'flex', 'align-items': 'center'},
-            ),
-            html.H3(children="Choose whether to normalise data", style={'textAlign': 'center', 'padding-top': 20}),
+                         style={'width': '100%', 'justify-content': 'end', 'margin-bottom': '2em'}, clearable=False),
+            html.H3(children="Choose whether to normalise data", style={'textAlign': 'center'}),
             dcc.RadioItems(
                 id='state-line-chart-normaliser',
                 options=["Normalise data", "Don't normalise data"],
                 value="Don't normalise data",
-                labelStyle={'display': 'flex'}),
+                labelStyle={'display': 'flex'},
+                style={'margin-bottom': '2em'}),
+            CheckList("Choose states", statesList[:18], 'state-line-chart-state-selection', True),
         ],
         graph=dcc.Graph(id='state-line-chart', style=graphStyle),
-        right_of_graph=[
-            html.H3(children="Choose states", style={'textAlign': 'center'}),
-            dcc.Checklist(
-                id="state-line-chart-state-selection2",
-                options=[{'label': html.Span(i, style={'padding-left': 10}), 'value': i} for i in statesList[len(statesList)//2:]],
-                value=[],
-                inline=False,
-                labelStyle={'display': 'flex', 'align-items': 'center'},
-            ),
-        ]
+        right_of_graph=[dbc.Form([
+            CheckList("Choose States", statesList[18:], 'state-line-chart-state-selection2', True),
+        ])]
 
     ),
 
@@ -282,16 +262,15 @@ def update_state_line_chart(event_type: str, states_selected1, states_selected2,
         # Divide the amount of events for each year by the first year and multiply by 100
         active_rows['Amount of Events'] = active_rows['Amount of Events'] / first_year * 100
 
-    # Color everything in light grey
-    # Color the hovered line in grey
     fig = px.line(
         active_rows,
         x="Year",
         y="Amount of Events",
         labels=labels,
-        color_discrete_sequence=['lightgrey'],
+        color_discrete_sequence=['grey'],
         hover_data={'Amount of Events': False},
         color="State",
+        markers=True,
     )
 
     if normalise == "Normalise data":
@@ -348,8 +327,20 @@ def update_horizontal_bar_graph(value) -> Figure:
                        height=1200,
                        title="Years chosen by slider " + inputMarks[value[0]] + " to " + inputMarks[value[1]],
                        category_orders=get_category_orders(),
-                       color_discrete_sequence=legendColors
+                       color_discrete_sequence=legendColors,
+                       hover_data=active_rows
+
                        )
+
+    # User hover data to obtain the amount of events in the selected state
+    
+    fig.update_traces(
+        texttemplate='%{x:.2f}',
+        hovertemplate='<b>%{data.name}</b><br>' +
+                      '<b>' + 'Amount of events' + ':</b> %{x}<br>' +
+                      '<b>State:</b> %{y}<br>' +
+                      '<extra></extra>',
+    )
 
     # Sort in descending order
     fig.update_yaxes(
