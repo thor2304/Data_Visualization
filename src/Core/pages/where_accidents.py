@@ -47,7 +47,15 @@ layout = html.Div([
         graph=dcc.Graph(id='accident-map', style=graphStyle),
         right_of_graph=[
             html.Div([
-                html.P(children="", style={'padding': '2em', "width": "100%", "background-color": color})
+                html.Div(children=[
+                    html.Div(style={'width': '2em', "height": "4em", "background-color": color}),
+                    html.Div(children=[
+                        html.P(["- ", "top"]),
+                        html.P(["- ", "bottom"])
+                    ], style={"height": "4em", "padding-left": ".2em", "width": "fit-content", "text-align": "left",
+                              "display": "flex",
+                              "justify-content": "space-between", "align-items": "left", "flex-direction": "column"})
+                ], style={'display': 'flex', 'flex-direction': 'row', 'align-items': 'center', 'padding': '.5em'})
                 for color in reversed(colorBarColors)
             ], id="color-bar", style={"width": "fit-content"})
         ]
@@ -110,7 +118,9 @@ def update_colorscale(children, figure):
     stops.append(max)
 
     for i, child in enumerate(reversed(children)):
-        child["props"]["children"] = f"{stops[i]} - {stops[i + 1]}"
+        p_tags = child["props"]["children"][1]["props"]["children"]
+        p_tags[1]["props"]["children"][1] = f"{stops[i]}"
+        p_tags[0]["props"]["children"][1] = f"{stops[i + 1]}"
     return children
 
 
