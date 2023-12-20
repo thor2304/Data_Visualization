@@ -332,16 +332,6 @@ def update_horizontal_bar_graph(value) -> Figure:
 
                        )
 
-    # User hover data to obtain the amount of events in the selected state
-    
-    fig.update_traces(
-        texttemplate='%{x:.2f}',
-        hovertemplate='<b>%{data.name}</b><br>' +
-                      '<b>' + 'Amount of events' + ':</b> %{x}<br>' +
-                      '<b>State:</b> %{y}<br>' +
-                      '<extra></extra>',
-    )
-
     # Sort in descending order
     fig.update_yaxes(
         categoryorder="total ascending",
