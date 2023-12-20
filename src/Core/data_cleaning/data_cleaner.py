@@ -63,6 +63,7 @@ us_state_to_abbrev = {
 
 # invert the dictionary
 abbrev_to_us_state = dict(map(reversed, us_state_to_abbrev.items()))
+abbrev_to_us_state["Unknown"] = "Unknown"
 
 
 def write_cleaned(filepath: str):
@@ -134,24 +135,9 @@ def main():
     df = add_month_column(df)
     df = add_state_column(df)
     df = add_event_divided_by_citizens(df)
+    add_columns_for_time_of_day(df)
 
-    # print(df.info())
-    for row in df.iterrows():
-        # print(row[1].iloc[20])
-        rowRead = row[1].iloc[index]
-        rowRead = row[1]["Vehicle Speed"]
-        if column_contents.get(rowRead) is None:
-            column_contents[rowRead] = 1
-        else:
-            column_contents[rowRead] += 1
-    # write_cleaned("Major_Safety_Events.csv")
-    pass
-
-    # print(column_contents)
-    high_keys = filter(lambda x: x > 20, column_contents.keys())
-
-    for key in high_keys:
-        print(f"{key}: {column_contents[key]}")
+    df = df[df['Event Type Group'] != "Non-RGX Collision"]
 
     df = cap_column(df, "Vehicle Speed", 200)
 
@@ -161,28 +147,37 @@ def main():
 
 
 def cap_column(df, column_name, cap):
+    print(f"Capping {column_name} at {cap}")
     df.loc[df[column_name] > cap, column_name] = cap
     return df
 
 
 def add_month_column(df: pd.DataFrame):
-    for index, row in df.iterrows():
-        df.at[index, 'Month'] = row['Event Date'].month_name()
+    df['Month'] = df["Event Date"].apply(
+        lambda x: x.month_name())
     return df
+
+
+def add_columns_for_time_of_day(df: pd.DataFrame):
+    print("Adding columns for time of day")
+    df["Number of accidents"] = 1
+
+    df['Hour'] = df['Event Time'].apply(
+        lambda x: x.replace(second=0, microsecond=0, minute=0, hour=x.hour)
+    )
 
 
 # This method is dependent on add_state_column
 def add_event_divided_by_citizens(df: pd.DataFrame):
+    print("Adding event per mil citizens column")
     state_population = pd.read_csv(f"../data/states-population.csv")
 
-    for index, row in df.iterrows():
-        print(f"index: {index} of {len(df)}")
-        state = row['State']
-        if state == "Unknown" or state == "Puerto Rico":
-            continue
-        year = row['Year']
-        population = state_population.loc[state_population['Years'] == str(state), str(year)].values[0]
-        df.at[index, 'Event Per Mil Citizens'] = 1000000 / population
+    df['Event Per Mil Citizens'] = df.apply(
+        lambda x:
+        0 if x["State"] == "Unknown" or x["State"] == "Puerto Rico" else
+        1000000 / state_population.loc[state_population['Years'] == str(x["State"]), str(x['Year'])].values[0]
+        , axis=1, )
+
     return df
 
 
@@ -193,19 +188,14 @@ def add_state_column(df: pd.DataFrame):
     data['NTD ID'] = agencies['NTD ID']
     data['State'] = agencies['State']
 
-    for index, row in df.iterrows():
-        print(f"index: {index} of {len(df)}")
-        agency_id = row['NTD ID']
-        results = data.loc[data['NTD ID'] == str(agency_id)]
-        if len(results) == 0:
-            df.at[index, 'State'] = "Unknown"
-        else:
-            df.at[index, 'State'] = abbrev_to_us_state[results.iloc[0]['State']]
+    agencyMap = {}
 
-    # Use df.map instead of the for loop
-    # The input value for the key should be converted to string
-    # The output value should be converted to a list
-    # df['State'] = df['NTD ID'].map(lambda x: abbrev_to_us_state[data.loc[data['NTD ID'] == str(x)].iloc[0]['State']])
+    for index, row in agencies.iterrows():
+        agencyMap[row['NTD ID']] = row['State']
+
+    df['State'] = df['NTD ID'].apply(
+        lambda x: abbrev_to_us_state[agencyMap.get(str(x), "Unknown")]
+    )
 
     return df
 
