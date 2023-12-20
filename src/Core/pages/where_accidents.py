@@ -16,6 +16,15 @@ df = get_df()
 
 eventsList = sorted(df["Event Type Group"].unique())
 
+colorBarColors = [
+    legendColors[4],
+    legendColors[0],
+    legendColors[2],
+    legendColors[3],
+]
+
+colorSteps = [0.01, 0.1, 0.3]
+
 layout = html.Div([
     html.H1('Do certain types of accidents occur more often in certain environments?',
             style={'textAlign': 'center'}),
@@ -35,7 +44,21 @@ layout = html.Div([
                     ),
                     className="py-2",
                 )])],
-        graph=dcc.Graph(id='accident-map', style=graphStyle)
+        graph=dcc.Graph(id='accident-map', style=graphStyle),
+        right_of_graph=[
+            html.Div([
+                html.Div(children=[
+                    html.Div(style={'width': '2em', "height": "4em", "background-color": color}),
+                    html.Div(children=[
+                        html.P(["- ", "top"]),
+                        html.P(["- ", "bottom"])
+                    ], style={"height": "4em", "padding-left": ".2em", "width": "fit-content", "text-align": "left",
+                              "display": "flex",
+                              "justify-content": "space-between", "align-items": "left", "flex-direction": "column"})
+                ], style={'display': 'flex', 'flex-direction': 'row', 'align-items': 'center', 'padding': '.5em'})
+                for color in reversed(colorBarColors)
+            ], id="color-bar", style={"width": "fit-content"})
+        ]
 
     ),
     GraphDiv(
@@ -51,6 +74,66 @@ layout = html.Div([
         ],
         graph=dcc.Graph(id='top10-bar', style=graphStyle)),
 ], style={'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}, )
+
+
+def discrete_colorscale(breakpoints=None, discrete=True):
+    """
+    bvals - list of values bounding intervals/ranges of interest
+    colors - list of rgb or hex color codes for values in [bvals[k], bvals[k+1]],0<=k < len(bvals)-1
+    returns a nonuniform   discrete colorscale
+    """
+    if breakpoints is None:
+        breakpoints = [0, 1]
+
+    if len(breakpoints) != len(colorBarColors) - 1:
+        raise ValueError("Breakpoints must be same length as colors")
+
+    out = [
+        [0, colorBarColors[0]],
+    ]
+
+    if discrete:
+        out.append([breakpoints[0], colorBarColors[0]])
+
+    for k in range(1, len(breakpoints)):
+        col = colorBarColors[k]
+
+        colorstop = breakpoints[k - 1]
+        out.append([colorstop, col])
+
+        if discrete:
+            colorstop = breakpoints[k]
+            out.append([colorstop, col])
+
+    if discrete:
+        out.append([breakpoints[-1], colorBarColors[-1]])
+
+    out.append([1, colorBarColors[-1]])
+
+    return out
+
+
+@callback(
+    Output('color-bar', 'children'),
+    Input('color-bar', 'children'),
+    Input('accident-map', 'figure'),
+)
+def update_colorscale(children, figure):
+    min = figure["layout"]["coloraxis"]["cmin"]
+    max = figure["layout"]["coloraxis"]["cmax"]
+
+    stops = [min]
+
+    for step in colorSteps:
+        stops.append(min + step * (max - min))
+
+    stops.append(max)
+
+    for i, child in enumerate(reversed(children)):
+        p_tags = child["props"]["children"][1]["props"]["children"]
+        p_tags[1]["props"]["children"][1] = f"{stops[i]}"
+        p_tags[0]["props"]["children"][1] = f"{stops[i + 1]}"
+    return children
 
 
 @callback(
@@ -71,7 +154,6 @@ def update_map(value: int, event_type: str) -> Figure:
 
     min_count = 0
     opacity_value = 0.2
-
     if value > 200:
         min_count = 1
         opacity_value = 0.5
@@ -84,14 +166,13 @@ def update_map(value: int, event_type: str) -> Figure:
         opacity=opacity_value,
         labels={"color": "Number of accidents"},
         color="Number of accidents",
-        color_continuous_scale=[legendColors[4], legendColors[0], legendColors[2], legendColors[3]],
+        color_continuous_scale=discrete_colorscale(colorSteps, True),
         mapbox_style="open-street-map",
         min_count=min_count,
         agg_func=np.sum,
         zoom=3.7,
         center=dict(lat=38.92, lon=-96),
-        range_color=[0, 200],
-
+        # range_color=[0, 200],
     )
 
     return fig

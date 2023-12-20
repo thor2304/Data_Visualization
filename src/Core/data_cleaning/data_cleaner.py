@@ -143,7 +143,8 @@ def main():
     df = df[(df['Latitude'] < 90) | (df['Latitude'].isna())]
 
     # Drop rows where longitude is higher than -45
-    df = df[(df['Longitude'] < -45) | (df['Longitude'].isna())]
+    mask = (df['Longitude'] < -45) | df['Longitude'].isna()
+    df = df[mask]
 
     df = cap_column(df, "Vehicle Speed", 200)
 
@@ -208,7 +209,7 @@ def add_state_column(df: pd.DataFrame):
 
 def add_percentage_out_of_total_accidents_per_state(df: pd.DataFrame):
     print("Adding percentage out of total accidents in state")
-    number_of_accidents_per_state = df.groupby("State", as_index=False).agg({"Number of accidents": sum})
+    number_of_accidents_per_state = df.groupby("State", as_index=False).agg({"Number of accidents": "sum"})
     df['Percentage of accidents in state'] = df.apply(
         lambda x:
         0 if x["State"] == "Unknown" or x["State"] == "Puerto Rico" else
