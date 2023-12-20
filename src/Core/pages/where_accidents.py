@@ -192,11 +192,13 @@ def update_bar(bar_event_type: str) -> Figure:
 
     # sum the percentage of accidents in Alabame for each event type
     alabama_df = newDf[newDf["State"] == "Louisiana"]
-    alabama_df = alabama_df.groupby(["Event Type Group"], as_index=False).agg({"Percentage of accidents in state": sum})
+    alabama_df = alabama_df.groupby(["Event Type Group"], as_index=False).agg(
+        {"Percentage of accidents in state": "sum"})
     print(alabama_df)
 
     # get top 10 states with the highest percentage of accidents for the selected event type out of all event types
-    grouped_df = newDf.groupby(["State", "Event Type Group"], as_index=False).agg({"Percentage of accidents in state": sum})
+    grouped_df = newDf.groupby(["State", "Event Type Group"], as_index=False).agg(
+        {"Percentage of accidents in state": "sum"})
     grouped_df = grouped_df.sort_values("Percentage of accidents in state", ascending=False)
     grouped_df = grouped_df[grouped_df["Event Type Group"] == bar_event_type]
     grouped_df = grouped_df.head(10)
@@ -208,7 +210,5 @@ def update_bar(bar_event_type: str) -> Figure:
                  )
 
     fig.update_yaxes(ticksuffix="%")
-
-
 
     return fig
