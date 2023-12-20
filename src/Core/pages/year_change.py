@@ -1,5 +1,4 @@
 import dash
-import dash_bootstrap_components as dbc
 import numpy as np
 import pandas as pd
 import plotly.express as px
@@ -8,8 +7,7 @@ from plotly.graph_objs import Figure
 
 from src.Core.CustomComponents import GraphDiv
 from src.Core.data_provider import get_df, get_category_orders
-from src.Core.styles import graphStyle, pageStyle, graphDivStyle, textStyle, textTitleStyle, labelStyle, \
-    legendColors
+from src.Core.styles import graphStyle, pageStyle, textStyle, textTitleStyle, labelStyle, legendColors
 
 # The following dicts are used to map the index of the slider to a date.
 inputMarks = {
@@ -83,8 +81,8 @@ layout = html.Div([
                     "the data can be normalised. "
                     "Normalising the data means that the different Event Types are indexed to the first year. ",
            style=textStyle),
-    html.Div([
-        html.Div([
+    GraphDiv(
+        left_of_graph=[
             html.H3(children="Choose event type", style={'textAlign': 'center'}),
             dcc.Checklist(
                 id="event-checklist",
@@ -99,17 +97,18 @@ layout = html.Div([
                 options=["Normalise data", "Don't normalise data"],
                 value="Don't normalise data",
                 labelStyle={'display': 'flex'}),
-        ], style={'width': '60%', 'margin': 'auto', 'height': '100%'}),
-        dcc.Graph(id='event-graph', style=graphStyle),
-        html.H1('', style={'textAlign': 'center '}),
-    ], style=graphDivStyle),
+        ],
+        graph=dcc.Graph(id='event-graph', style=graphStyle)
+    ),
 
     # LINE CHART WITH STATES #########################################################
     html.H3(children="Events per state", style=textTitleStyle),
-    html.P(children="The following horizontal bar graph shows the amount of events per state for a specific year or a range of years. ",
-            style=textStyle),
-    html.Div([
-        html.Div([
+    html.P(
+        children="The following horizontal bar graph shows the amount of events per state for a specific year or "
+                 "a range of years. ",
+        style=textStyle),
+    GraphDiv(
+        left_of_graph=[
             html.H3(children="Choose event type", style={'textAlign': 'center'}),
             dcc.Dropdown(eventsList, eventsList[0], id='state-line-chart-event-selection',
                          style={'width': '100%', 'justify-content': 'end'}, clearable=False),
@@ -127,10 +126,9 @@ layout = html.Div([
                 options=["Normalise data", "Don't normalise data"],
                 value="Don't normalise data",
                 labelStyle={'display': 'flex'}),
-        ], style={'width': '60%', 'margin': 'auto', 'height': '100%'}),
-        dcc.Graph(id='state-line-chart', style=graphStyle),
-        html.H1('', style={'textAlign': 'center '}),
-    ], style=graphDivStyle),
+        ],
+        graph=dcc.Graph(id='state-line-chart', style=graphStyle)
+    ),
 
     # HORIZONTAL BAR GRAPH #########################################################
     html.H3(children="Horizontal bar graph", style=textTitleStyle),
@@ -143,7 +141,6 @@ layout = html.Div([
     html.P(children="Using the slider below, a specific year or a range of years can be selected, "
                     "which in return will be visualized in the graph.",
            style={'width': '40%', 'padding-bottom': 20}),
-
     GraphDiv(
         graph=html.Div([
             dcc.RangeSlider(
@@ -163,7 +160,6 @@ layout = html.Div([
     )
 
 ], style=pageStyle)
-
 
 
 # EVENT GRAPH #################################################################
@@ -236,6 +232,7 @@ def update_bar_event_graph(_: Figure) -> Figure:
 
     return fig
 
+
 # LINE CHART WITH STATES #########################################################
 @callback(
     Output('state-line-chart', 'figure'),
@@ -291,8 +288,6 @@ def update_state_line_chart(event_type: str, states_selected, normalise: str) ->
     )
 
     return fig
-
-
 
 
 ## Horizontal bar graph
