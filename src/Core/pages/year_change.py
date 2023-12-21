@@ -76,12 +76,18 @@ layout = html.Div([
         graph=dcc.Graph(id='event-graph', style=graphStyle),
         # right_of_graph=[html.H1('', style={'textAlign': 'center '})]
     ),
+    html.P(
+        children="From the graphs it is clear that the amount of events per year varies a lot between the different"
+                 "event types. "
+                 "Overall, the amount of events per year generally have not seen a growth or decline from 2014 to 2022. "
+                 "However, there might be increases or decreases in certain areas of the united states, which can't be seen in the previous graphs. ",
+        style=textStyle),
 
     # LINE CHART WITH STATES #########################################################
     html.H3(children="Events per state", style=textTitleStyle),
     html.P(
-        children="The following horizontal bar graph shows the amount of events per state for a specific year or "
-                 "a range of years. ",
+        children="To explore the development in the different states, the following graph shows the amount of events per year for each state. "
+                 "The graph can be modified to show specific states and event types. ",
         style=textStyle),
     GraphDiv(
         left_of_graph=[
