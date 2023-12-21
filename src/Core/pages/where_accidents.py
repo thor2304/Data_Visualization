@@ -131,8 +131,8 @@ def update_colorscale(children, figure):
 
     for i, child in enumerate(reversed(children)):
         p_tags = child["props"]["children"][1]["props"]["children"]
-        p_tags[1]["props"]["children"][1] = f"{stops[i]}"
-        p_tags[0]["props"]["children"][1] = f"{stops[i + 1]}"
+        p_tags[1]["props"]["children"][1] = f"{stops[i]:.2f}"
+        p_tags[0]["props"]["children"][1] = f"{stops[i + 1]:.2f}"
     return children
 
 
