@@ -1,3 +1,5 @@
+import trace
+
 import dash
 import numpy as np
 import pandas as pd
@@ -84,15 +86,21 @@ layout = html.Div([
            style=textStyle),
     GraphDiv(
         left_of_graph=[
-            CheckList("Choose event type", eventsList, 'event-checklist'),
-            html.H3(children="Choose whether to normalise data", style={'textAlign': 'center', 'padding-top': 20}),
-            dcc.RadioItems(
-                id='event-normaliser',
-                options=["Normalise data", "Don't normalise data"],
-                value="Don't normalise data",
-                labelStyle={'display': 'flex'}),
-        ],
-        graph=dcc.Graph(id='event-graph', style=graphStyle)
+            CheckList(title="Choose event types", options=eventsList, checklist_id="event-checklist"),
+            dbc.Form([
+                html.H3(children="Choose whether to normalise data",
+                        style={'textAlign': 'center', 'padding-top': 20}),
+                html.P(children="Relative to the accidents in 2014"),
+                html.Div(
+                    dbc.RadioItems(
+                        options=["Don't normalise data", "Normalise data", ],
+                        value="Don't normalise data",
+                        id="event-normaliser",
+                    ),
+                    className="py-2",
+                )])],
+        graph=dcc.Graph(id='event-graph', style=graphStyle),
+        # right_of_graph=[html.H1('', style={'textAlign': 'center '})]
     ),
 
     # LINE CHART WITH STATES #########################################################
@@ -160,7 +168,7 @@ layout = html.Div([
     Input('event-checklist', 'value'),
     Input('event-normaliser', 'value')
 )
-def update_event_graph(value: str, value2: str) -> Figure:
+def update_event_graph(value: list[str], value2: str) -> Figure:
     labels = {
         "Year": "Years",
         "Amount of Events": "Amount of events",
@@ -192,16 +200,36 @@ def update_event_graph(value: str, value2: str) -> Figure:
         color="Event Type Group",
         labels=labels,
         category_orders=get_category_orders(),
-        color_discrete_sequence=legendColors
+        color_discrete_sequence=legendColors,
     )
+
+    fig.add_annotation(x=2020, y=0.5,
+                       yref="paper",
+                       text="Covid 19 lockdown in 2020",
+                       bgcolor="rgba(255, 255, 255, 0.8)",
+                       showarrow=False,
+                       arrowhead=1)
 
     if value2 == "Normalise data":
         fig.update_yaxes(ticksuffix="%")
     else:
         fig.update_yaxes(autorangeoptions_include=[0])
 
+    # Hover settings for the graph
+    fig.update_traces(
+        mode='lines+markers',
+        line=dict(width=3),
+        marker=dict(size=7),
+        hovertemplate='<b>%{data.name}:</b> %{y}<br>' +
+                      '<extra></extra>',
+    )
+
+    fig.update_xaxes(dtick=1)
+
     fig.update_layout(
         hoverlabel=labelStyle,
+        hoverdistance=20,
+        hovermode='x unified',
     )
 
     return fig
@@ -213,13 +241,20 @@ def update_event_graph(value: str, value2: str) -> Figure:
     Input('bar-event-graph', 'style')
 )
 def update_bar_event_graph(_: Figure) -> Figure:
-    fig = px.histogram(df, x="Event Type Group", color="Event Type Group", category_orders=get_category_orders(),
-                       color_discrete_sequence=legendColors)
+    fig = px.pie(df, names="Event Type Group", color="Event Type Group", category_orders=get_category_orders(),
+                 color_discrete_sequence=legendColors, hole=0.65)
 
-    # sort in descending order
-    fig.update_xaxes(
-        categoryorder="total descending",
-        title_text="Event Type Group"
+    # Hover settings for the graph
+    fig.update_traces(
+        hovertemplate='<b>%{label}</b><br>' +
+                      '<b>Amount of events:</b> %{value}<br>' +
+                      '<b>Percentage of all events:</b> %{percent}<br>' +
+                      '<extra></extra>',
+        textfont_size=14,
+    )
+
+    fig.update_layout(
+        hoverlabel=labelStyle,
     )
 
     return fig
@@ -331,6 +366,18 @@ def update_horizontal_bar_graph(value) -> Figure:
     fig.update_yaxes(
         categoryorder="total ascending",
         title_text="States"
+    )
+
+    # Hover settings for the graph
+    fig.update_traces(
+        hovertemplate='<b>%{data.name}</b><br>' +
+                      '<b>Event Per Mil Citizens: %{x:.2f}</b><br>' +
+                      '<extra></extra>',
+    )
+
+    fig.update_layout(
+        hovermode='y unified',
+        bargap=0.3,
     )
 
     return fig
