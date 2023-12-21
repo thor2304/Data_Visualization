@@ -10,7 +10,7 @@ import dash_bootstrap_components as dbc
 from src.Core.styles import graphStyle, dropdownStyle
 from src.Core.data_provider import get_df
 
-dash.register_page(__name__, path='/', name="Introduction")
+dash.register_page(__name__, path='/', name="Introduction", order=0)
 
 us = united_states.UnitedStates()
 

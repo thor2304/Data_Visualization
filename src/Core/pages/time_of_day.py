@@ -9,7 +9,7 @@ from src.Core.CustomComponents import GraphDiv, CheckList
 from src.Core.data_provider import get_df, get_category_orders, get_reverse_category_orders
 from src.Core.styles import graphDivStyle, pageStyle, graphStyle, legendColors
 
-dash.register_page(__name__, name="When does injuries happen?")
+dash.register_page(__name__, name="2. When does injuries happen?", order=2)
 
 df = get_df()
 

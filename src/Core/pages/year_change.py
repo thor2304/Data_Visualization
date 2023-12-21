@@ -39,7 +39,7 @@ months = {
     8: "September", 9: "October", 10: "November", 11: "December"
 }
 
-dash.register_page(__name__, name="Do more happen every year?")
+dash.register_page(__name__, name="1. Do more happen every year?", order=1)
 
 df = get_df()
 

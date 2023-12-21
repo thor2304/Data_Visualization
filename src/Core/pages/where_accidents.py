@@ -10,7 +10,7 @@ from src.Core.CustomComponents import GraphDiv, CheckList
 from src.Core.data_provider import get_df, get_category_orders
 from src.Core.styles import graphStyle, dropdownStyle, legendColors
 
-dash.register_page(__name__, name="Where do accidents happen?")
+dash.register_page(__name__, name="3. Where do accidents happen?", order=3)
 
 df = get_df()
 
