@@ -80,7 +80,7 @@ layout = html.Div([
     html.Div([
         html.H1('Is there a relation between time periods in the day and certain types of accidents?',
                 style={'textAlign': 'center'}),
-        dcc.Graph(id='accident-map', style=graphStyle),
+        dcc.Graph(id='accident-map2', style=graphStyle),
     ], style={'width': '60%'}),
 ], style={'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}, )
 
@@ -221,11 +221,13 @@ def update_bar(bar_event_type: str) -> Figure:
 
     return fig
 
+@callback(
+    Output('accident-map2', 'figure'),
+    Input('accident-map2', 'figure'),
+)
 def update_map(value: str) -> Figure:
     # Callbacks in Dash have to have an output and an input.
     # We don't use the input for this, but we need it to trigger the callback
-    df = get_df()
-
     fig = ff.create_hexbin_mapbox(
         data_frame=df,
         lat="Latitude",
@@ -233,8 +235,8 @@ def update_map(value: str) -> Figure:
         nx_hexagon=10,
         opacity=0.9,
         labels={"color": "Accident Count"},
+        mapbox_style="open-street-map",
     )
 
-    px.set_mapbox_access_token(open(".mapbox_token").read())
     fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
     return fig
