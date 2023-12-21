@@ -8,7 +8,7 @@ import dash_bootstrap_components as dbc
 
 from src.Core.CustomComponents import GraphDiv, CheckList
 from src.Core.data_provider import get_df, get_category_orders
-from src.Core.styles import graphStyle, dropdownStyle, legendColors, textStyle, textTitleStyle
+from src.Core.styles import graphStyle, dropdownStyle, legendColors, textStyle, textTitleStyle, headerStyle
 
 dash.register_page(__name__, name="Where do accidents happen?")
 
@@ -27,7 +27,7 @@ colorSteps = [0.01, 0.1, 0.3]
 
 layout = html.Div([
     html.H1('Do certain types of accidents occur more often in certain environments?',
-            style={'textAlign': 'center', 'padding-bottom': 40, 'padding-top': 50}),
+            style=headerStyle),
     html.P(children="To find out if certain types of accidents happen more often in certain environments or states. "
                     "We have chosen to create a Hexbin Mapbox for creating a map, "
                     "that is divided into hexagons and colored by the number of accidents in the area of the hexagon. ",
@@ -90,14 +90,19 @@ layout = html.Div([
             ], id="color-bar", style={"width": "fit-content"})
         ]
     ),
-    html.H3(["Percentage of ", html.B("Accident type", id="accident-type-indicator-text"), " per state"],
+    html.H3(["Percentage of ",
+             html.B("Accident type", id="accident-type-indicator-text"),
+             " events per state"],
             style=textTitleStyle),
-    html.P(children="To show the percentage of accidents per state, we chose to create a colored bar chart. "
-                    "You can chose to see the percentage of the different types of accidents, "
-                    "in the left side of the screen. ",
-           style=textStyle),
-    html.P(children="The bar chart represents the percentage of accidents per state, "
-                    "and is colored based on the selected accident type. ",
+    html.P("We wanted to see if different states had a different makeup of accidents compared to each other. "
+           "Below we have calculated how much each Event Type makes up,"
+           " out of the total events that happened in the state. "
+           "The 10 states that have the highest percentage for the chosen event type are shown in the chart. "
+           "We can see that 4 states, have only reported collisions and no other event types for all 7 years. "
+           "This provides further insight to the data, "
+           "since it is unlikely that these states have only had collisions. "
+           "This is most likely caused by the reporting agencies from these states, only reporting collisions."
+           ,
            style=textStyle),
     GraphDiv(
         left_of_graph=[
