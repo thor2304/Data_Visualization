@@ -53,19 +53,19 @@ layout = html.Div([
     html.H1(children="Is there an increase or decrease in certain types of accidents in the last 9 years?",
             style={'textAlign': 'center', 'padding-bottom': 20, 'padding-top': 50}),
     html.P(children="To answer this question, the page contains three different graphs. "
-                    "The first graph is a bar graph, which shows the amount of events in the period 2014-2022. "
+                    "The first graph is a doughnut chart, which shows the amount of events in the period 2014-2022. "
                     "The second graph is a line graph, which shows the amount of events per year for each event type. "
                     "This graph highlights the evolution of the different event types over the years."
                     "The third graph is a horizontal bar graph, which shows the amount of events per state for a specific year or a range of years. ",
            style=textStyle),
 
-    # BAR GRAPH #####################################################################
+    # PIE CHART #####################################################################
     html.H3(children="Amount of events in the period 2014-2022", style=textTitleStyle),
-    html.P(children="The amount of events in the period 2014-2022, is shown through a bar graph. "
-                    "The bar graph aims at visualizing the amount of events for each event type."
+    html.P(children="The amount of events in the period 2014-2022, is shown through a doughnut chart. "
+                    "The doughnut chart aims at visualizing the amount of events for each event type."
                     "This should result in a clear overview of the amount of events for each event type. ",
            style=textStyle),
-    html.P(children="From the bar graph it is clear that collisions and assaults are the most common event types. "
+    html.P(children="From the doughnut chart it is clear that collisions and assaults are the most common event types. "
                     "The other event types are rare compared to collisions and assaults. "
                     "The event types Security and Other may not be as clear as the other event types in the context of what they include. "
                     "The event type Security includes events such as bomb threats, hijackings and random gun fire. "
@@ -115,12 +115,14 @@ layout = html.Div([
             dcc.Dropdown(eventsList, eventsList[0], id='state-line-chart-event-selection',
                          style={'width': '100%', 'justify-content': 'end', 'margin-bottom': '2em'}, clearable=False),
             html.H3(children="Choose whether to normalise data", style={'textAlign': 'center'}),
-            dcc.RadioItems(
-                id='state-line-chart-normaliser',
-                options=["Normalise data", "Don't normalise data"],
-                value="Don't normalise data",
-                labelStyle={'display': 'flex'},
-                style={'margin-bottom': '2em'}),
+            html.Div(
+                    dbc.RadioItems(
+                        options=["Don't normalise data", "Normalise data", ],
+                        value="Don't normalise data",
+                        id='state-line-chart-normaliser',
+                    ),
+                    className="py-2",
+                ),
             CheckList("Choose states", statesList[:18], 'state-line-chart-state-selection', True),
         ],
         graph=dcc.Graph(id='state-line-chart', style=graphStyle),
@@ -235,7 +237,7 @@ def update_event_graph(value: list[str], value2: str) -> Figure:
     return fig
 
 
-# BAR GRAPH #################################################################
+# PIE CHART #################################################################
 @callback(
     Output('bar-event-graph', 'figure'),
     Input('bar-event-graph', 'style')
@@ -311,15 +313,21 @@ def update_state_line_chart(event_type: str, states_selected1, states_selected2,
     else:
         fig.update_yaxes(autorangeoptions_include=[0])
 
+    # Hover settings for the graph
     fig.update_traces(
-        hovertemplate='<b>%{data.name}</b><br>' +
-                      '<b>' + labels["Amount of Events"] + ':</b> %{y}<br>' +
-                      '<b>Year:</b> %{x}<br>' +
+        mode='lines+markers',
+        line=dict(width=3),
+        marker=dict(size=7),
+        hovertemplate='<b>%{data.name}:</b> %{y}<br>' +
                       '<extra></extra>',
     )
 
+    fig.update_xaxes(dtick=1)
+
     fig.update_layout(
         hoverlabel=labelStyle,
+        hoverdistance=20,
+        hovermode='x unified',
     )
 
     return fig
