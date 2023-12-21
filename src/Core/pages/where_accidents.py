@@ -24,7 +24,6 @@ colorBarColors = [
 ]
 
 colorSteps = [0.01, 0.1, 0.3]
-
 layout = html.Div([
     html.H1('Do certain types of accidents occur more often in certain environments?',
             style={'textAlign': 'center'}),
@@ -63,6 +62,7 @@ layout = html.Div([
     ),
     GraphDiv(
         left_of_graph=[
+            html.H3(children="Choose event type", style={'textAlign': 'center', 'padding-top': 20}),
             html.Div(
                 dbc.RadioItems(
                     options=eventsList,
@@ -74,6 +74,7 @@ layout = html.Div([
         ],
         graph=dcc.Graph(id='top10-bar', style=graphStyle)),
 ], style={'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}, )
+
 
 
 def discrete_colorscale(breakpoints=None, discrete=True):
