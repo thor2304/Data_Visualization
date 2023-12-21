@@ -164,6 +164,7 @@ layout = html.Div([
 ], style=pageStyle)
 
 
+
 # EVENT GRAPH #################################################################
 @callback(
     Output('event-graph', 'figure'),

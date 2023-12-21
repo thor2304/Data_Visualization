@@ -5,6 +5,7 @@ graphDivStyle = {'grid-template-columns': '1fr 60% 1fr', 'display': 'grid', 'jus
 pageStyle = {'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}
 textStyle = {'width': '40%', 'margin': 'auto', 'padding-bottom': 20}
 textTitleStyle = {'textAlign': 'center', 'padding-bottom': 20, 'padding-top': 50}
+headerStyle = {'textAlign': 'center', 'width': '60%'}
 
 labelStyle = dict(
     bgcolor="white",
