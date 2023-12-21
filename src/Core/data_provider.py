@@ -45,3 +45,4 @@ def get_reverse_category_orders() -> dict:
         return reverse_category_orders
     reverse_category_orders = {"Event Type Group": sorted(get_df()["Event Type Group"].unique(), reverse=True)}
     return reverse_category_orders
+
