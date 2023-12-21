@@ -1,8 +1,5 @@
-import trace
-
 import dash
 import numpy as np
-import pandas as pd
 import dash_bootstrap_components as dbc
 import plotly.express as px
 from dash import html, dcc, callback, Output, Input
@@ -18,13 +15,14 @@ df = get_df()
 
 # The different types of events. Used to create the checklist
 eventsList = sorted(df["Event Type Group"].unique())
+
 # statesList without Unknown
 statesListRaw = df["State"].unique()
 statesList = np.delete(statesListRaw, np.where(statesListRaw == "Unknown"))
 
 layout = html.Div([
     html.H1(children="Is there an increase or decrease in certain types of accidents in the last 9 years?",
-            style={'textAlign': 'center', 'padding-bottom': 20, 'padding-top': 50}),
+            style={'textAlign': 'center', 'padding-bottom': 20, 'padding-top': 50, 'width': '40%'}),
     html.P(children="To answer this question, the page contains three different graphs. "
                     "The first graph is a doughnut chart, which shows the amount of events in the period 2014-2022. "
                     "The second graph is a line graph, which shows the amount of events per year for each event type. "
@@ -103,14 +101,30 @@ layout = html.Div([
                     ),
                     className="py-2",
                 ),
-            CheckList("Choose states", statesList[:18], 'state-line-chart-state-selection', True),
+            CheckList("Choose states", checklist_id='state-line-chart-state-selection', options=["Arizona"], only_select_first=True),
         ],
         graph=dcc.Graph(id='state-line-chart', style=graphStyle),
         right_of_graph=[dbc.Form([
-            CheckList("Choose States", statesList[18:], 'state-line-chart-state-selection2', True),
+            CheckList("Choose States", checklist_id='state-line-chart-state-selection2', options=["Arizona"], only_select_first=True),
         ])]
     )
 ], style=pageStyle)
+
+def get_states_based_on_event_type(event_type):
+    mask = df['Event Type Group'] == event_type
+    active_rows = df[mask]
+    # Sort and return states found
+    states = active_rows['State'].unique()
+    states.sort()
+    return states
+
+@callback(
+    Output('state-line-chart-state-selection', 'options'),
+    Output('state-line-chart-state-selection2', 'options'),
+    Input('state-line-chart-event-selection', 'value'),
+)
+def update_state_line_chart_checklist(value: str):
+    return get_states_based_on_event_type(value)[:17], get_states_based_on_event_type(value)[17:]
 
 
 # EVENT GRAPH #################################################################
@@ -251,7 +265,7 @@ def update_state_line_chart(event_type: str, states_selected1, states_selected2,
         x="Year",
         y="Amount of Events",
         labels=labels,
-        color_discrete_sequence=['grey'],
+        color_discrete_sequence=legendColors,
         hover_data={'Amount of Events': False},
         color="State",
         markers=True,
