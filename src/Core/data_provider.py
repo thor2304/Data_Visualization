@@ -28,6 +28,7 @@ def get_df():
 
 
 category_orders = None
+reverse_category_orders = None
 
 
 def get_category_orders() -> dict:
@@ -36,3 +37,11 @@ def get_category_orders() -> dict:
         return category_orders
     category_orders = {"Event Type Group": sorted(get_df()["Event Type Group"].unique())}
     return category_orders
+
+
+def get_reverse_category_orders() -> dict:
+    global reverse_category_orders
+    if reverse_category_orders is not None:
+        return reverse_category_orders
+    reverse_category_orders = {"Event Type Group": sorted(get_df()["Event Type Group"].unique(), reverse=True)}
+    return reverse_category_orders

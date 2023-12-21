@@ -6,7 +6,7 @@ import numpy as np
 import dash_bootstrap_components as dbc
 
 from src.Core.CustomComponents import GraphDiv, CheckList
-from src.Core.data_provider import get_df, get_category_orders
+from src.Core.data_provider import get_df, get_category_orders, get_reverse_category_orders
 from src.Core.styles import graphDivStyle, pageStyle, graphStyle, legendColors
 
 dash.register_page(__name__, name="When does injuries happen?")
@@ -48,6 +48,8 @@ layout = html.Div([
 ], style=pageStyle)
 
 
+
+
 @callback(
     Output('time-graph', 'figure'),
     Input('type-dropdown-selection', 'value'),
@@ -60,73 +62,12 @@ def time_of_day(y_selection: str, selected_event_types: list[str]) -> Figure:
     active_rows = df[mask]
     sorted_df = active_rows.sort_values("Event Date", ascending=True)
 
-    grouped_df = sorted_df.groupby(["Event Type Group", "Hour", "Month"], as_index=False).agg({y_selection: sum})
-    grouped_df = grouped_df.sort_values("Month", ascending=True)
-    #
-    # fig = px.histogram(sorted_df, x="Hour", y=y_selection, color='Event Type Group', orientation='v',
-    #                    category_orders=get_category_orders(),
-    #                    color_discrete_sequence=legendColors,
-    #                    )
-
-    fig = px.bar(grouped_df, x="Hour", y=y_selection, color='Event Type Group',
-                 category_orders=get_category_orders(),
-                 color_discrete_sequence=legendColors,
-                 animation_frame="Month",
-                 animation_group="Hour",
-                 )
-
-    # fig.update_layout(updatemenus=[
-    #     {
-    #         "buttons": [
-    #             {
-    #                 "args": [None, {"frame": {"duration": 500, "redraw": False},
-    #                                 "fromcurrent": True, "transition": {"duration": 300,
-    #                                                                     "easing": "quadratic-in-out"}}],
-    #                 "label": "Play",
-    #                 "method": "animate"
-    #             },
-    #             {
-    #                 "args": [[None], {"frame": {"duration": 0, "redraw": False},
-    #                                   "mode": "immediate",
-    #                                   "transition": {"duration": 0}}],
-    #                 "label": "Pause",
-    #                 "method": "animate"
-    #             }
-    #         ],
-    #         "direction": "left",
-    #         "pad": {"r": 10, "t": 87},
-    #         "showactive": False,
-    #         "type": "buttons",
-    #         "x": 0.1,
-    #         "xanchor": "right",
-    #         "y": 0,
-    #         "yanchor": "top"
-    #     }
-    # ]
-    # )
-
+    fig = px.histogram(sorted_df, x="Hour", y=y_selection, color='Event Type Group', orientation='v',
+                       category_orders=get_category_orders(),
+                       color_discrete_sequence=legendColors,
+                       )
 
     return treat_histogram_fig(fig, y_selection)
-
-
-# @callback(
-#     Output('time-graph', 'figure'),
-#     Input('type-dropdown-selection', 'value'),
-#     Input('event-checklist', 'value'),
-# )
-# def time_of_day(y_selection: str, selected_event_types: list[str]) -> Figure:
-#     # Hover could be solved by adding another column, that is Hour.dt.time, and then show that.
-#
-#     mask = df['Event Type Group'].isin(selected_event_types)
-#     active_rows = df[mask]
-#     sorted_df = active_rows.sort_values("Event Date", ascending=True)
-#
-#     fig = px.histogram(sorted_df, x="Hour", y=y_selection, color='Event Type Group', orientation='v',
-#                        category_orders=get_category_orders(),
-#                        color_discrete_sequence=legendColors,
-#                        )
-#
-#     return treat_histogram_fig(fig, y_selection)
 
 
 @callback(
@@ -136,45 +77,77 @@ def time_of_day(y_selection: str, selected_event_types: list[str]) -> Figure:
 )
 def animated_time_of_day(y_selection: str, selected_event_types: list[str]) -> Figure:
     # Hover could be solved by adding another column, that is Hour.dt.time, and then show that.
+    mask = df['Event Type Group'].isin(selected_event_types)
+    active_rows = df[mask]
+    sorted_df = active_rows.sort_values("Event Date", ascending=True)
+
     max_Ranges = {
         "Total Injuries": 700,
         "Number of accidents": 600,
         "Total Fatalities": 25,
     }
+    months = {
+        "January": 1,
+        "February": 2,
+        "March": 3,
+        "April": 4,
+        "May": 5,
+        "June": 6,
+        "July": 7,
+        "August": 8,
+        "September": 9,
+        "October": 10,
+        "November": 11,
+        "December": 12,
+    }
 
-    mask = df['Event Type Group'].isin(selected_event_types)
-    active_rows = df[mask]
-    sorted_df = active_rows.sort_values("Event Date", ascending=True)
+    months_number_to_name = {v: k for k, v in months.items()}
 
-    fig = px.histogram(sorted_df, x="Hour", y=y_selection, color='Event Type Group', orientation='v',
-                       category_orders=get_category_orders(),
-                       color_discrete_sequence=legendColors,
-                       animation_frame="Month",
-                       # animation_group="Event Type Group",
-                       range_y=[0, max_Ranges[y_selection]],
-                       # title="Number of accidents per hour of the day"
-                       )
+    grouped_df = sorted_df.groupby(["Event Type Group", "Hour", "Month"], as_index=False).agg({y_selection: "sum"})
+
+    # Reorder the rows so that the months are in the correct order
+    grouped_df["Month number"] = grouped_df["Month"].apply(lambda x: months[x])
+    grouped_df = grouped_df.sort_values("Month number", ascending=True)
+
+    fig = px.bar(grouped_df, x="Hour", y=y_selection, color='Event Type Group',
+                 category_orders=get_reverse_category_orders(),
+                 color_discrete_sequence=list(
+                     reversed(legendColors[0:len(get_reverse_category_orders()["Event Type Group"])])),
+                 animation_frame="Month",
+                 animation_group="Hour",
+                 range_y=[0, max_Ranges[y_selection]],
+                 )
 
     return treat_histogram_fig(fig, y_selection)
 
 
-def treat_histogram_fig(fig: Figure, y_selection: str, transition_duration = 1500) -> Figure:
+def treat_histogram_fig(fig: Figure, y_selection: str, show_text=True, transition_duration=1500) -> Figure:
     hovertemplate = '<b>%{data.name}</b><br>' + \
                     '<b>' + y_selection + ':</b> %{y}<br>' + \
                     '<b>Time:</b> %{x}<br>' + \
                     '<extra></extra>'
     texttemplate = '%{y}'
+    text_position = 'inside'
     fig.update_traces(
-        # texttemplate=texttemplate,
         hovertemplate=hovertemplate,
     )
+
+    if show_text:
+        fig.update_traces(
+            texttemplate=texttemplate,
+            textposition=text_position,
+        )
 
     for f in fig.frames:
         for trace in f.data:
             trace.update(
                 hovertemplate=hovertemplate,
-                # texttemplate=texttemplate
             )
+            if show_text:
+                trace.update(
+                    texttemplate=texttemplate,
+                    textposition=text_position,
+                )
 
     fig.update_xaxes(
         title_text="Time of day",
