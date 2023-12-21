@@ -131,13 +131,20 @@ def main():
 
     # Drop rows where Year is 2023
     df = df[df['Year'] != 2023]
+    df = df[df['Event Type Group'] != "Non-RGX Collision"]
 
     df = add_month_column(df)
     df = add_state_column(df)
     df = add_event_divided_by_citizens(df)
     add_columns_for_time_of_day(df)
+    add_percentage_out_of_total_accidents_per_state(df)
 
-    df = df[df['Event Type Group'] != "Non-RGX Collision"]
+    # Drop rows where latitude is above 90
+    df = df[(df['Latitude'] < 90) | (df['Latitude'].isna())]
+
+    # Drop rows where longitude is higher than -45
+    mask = (df['Longitude'] < -45) | df['Longitude'].isna()
+    df = df[mask]
 
     df = cap_column(df, "Vehicle Speed", 200)
 
@@ -198,6 +205,17 @@ def add_state_column(df: pd.DataFrame):
     )
 
     return df
+
+
+def add_percentage_out_of_total_accidents_per_state(df: pd.DataFrame):
+    print("Adding percentage out of total accidents in state")
+    number_of_accidents_per_state = df.groupby("State", as_index=False).agg({"Number of accidents": "sum"})
+    df['Percentage of accidents in state'] = df.apply(
+        lambda x:
+        0 if x["State"] == "Unknown" or x["State"] == "Puerto Rico" else
+        x["Number of accidents"] / number_of_accidents_per_state.loc[
+            number_of_accidents_per_state['State'] == x["State"], "Number of accidents"].values[0] * 100
+        , axis=1, )
 
 
 if __name__ == '__main__':
