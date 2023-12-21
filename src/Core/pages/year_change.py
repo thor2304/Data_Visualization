@@ -10,7 +10,7 @@ from plotly.graph_objs import Figure
 
 from src.Core.CustomComponents import GraphDiv, CheckList
 from src.Core.data_provider import get_df, get_category_orders
-from src.Core.styles import graphStyle, pageStyle, textStyle, textTitleStyle, labelStyle, legendColors
+from src.Core.styles import graphStyle, pageStyle, textStyle, textTitleStyle, labelStyle, legendColors, headerStyle
 
 # The following dicts are used to map the index of the slider to a date.
 inputMarks = {
@@ -51,7 +51,7 @@ statesList = np.delete(statesListRaw, np.where(statesListRaw == "Unknown"))
 
 layout = html.Div([
     html.H1(children="Is there an increase or decrease in certain types of accidents in the last 9 years?",
-            style={'textAlign': 'center', 'padding-bottom': 20, 'padding-top': 50}),
+            style=headerStyle),
     html.P(children="To answer this question, the page contains three different graphs. "
                     "The first graph is a doughnut chart, which shows the amount of events in the period 2014-2022. "
                     "The second graph is a line graph, which shows the amount of events per year for each event type. "

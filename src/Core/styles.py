@@ -4,8 +4,8 @@ graphDivStyle = {'grid-template-columns': '1fr 60% 1fr', 'display': 'grid', 'jus
                  'align-content': 'start', 'width': '100%'}
 pageStyle = {'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}
 textStyle = {'width': '40%', 'margin': 'auto', 'padding-bottom': 20}
-textTitleStyle = {'textAlign': 'center', 'padding-bottom': 20, 'padding-top': 50}
-headerStyle = {'textAlign': 'center', "width": "50%", 'padding-bottom': 30, 'padding-top': 30}
+textTitleStyle = {'textAlign': 'center', "width": "50%", 'padding-bottom': 20, 'padding-top': 50}
+headerStyle = {'textAlign': 'center', "width": "50%", 'padding-bottom': 40, 'padding-top': 20}
 
 labelStyle = dict(
     bgcolor="white",
