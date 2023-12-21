@@ -78,7 +78,8 @@ layout = html.Div([
             CheckList(title="Choose event types", options=eventsList, checklist_id="event-checklist-animated"),
         ],
         graph=dcc.Graph(id='time-graph-animated', style=graphStyle),
-    )
+    ),
+    html.Div(style={"height": "15em"}),
 ], style=pageStyle)
 
 
