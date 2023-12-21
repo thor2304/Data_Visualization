@@ -144,13 +144,12 @@ def update_colorscale(children, figure):
 def update_map(value: int, event_type: str) -> Figure:
     mask = df['Event Type Group'].isin(event_type) & df['Latitude'].notna() & df['Longitude'].notna()
     active_rows = df[mask]
-    print(f"Number of rows: {len(active_rows)}")
+
     # Drop rows where latitude is above 90
     active_rows = active_rows[active_rows['Latitude'] < 90]
 
     # Drop rows where longitude is higher than -45
     active_rows = active_rows[active_rows['Longitude'] < -45]
-    print(f"Number of rows after dropping: {len(active_rows)}")
 
     min_count = 0
     opacity_value = 0.2
