@@ -26,9 +26,11 @@ layout = html.Div([
            "and a rise in the afternoon. "
            "It is worth noting that the drop in the middle of the day for injuries is not as pronounced as expected.",
            style=textStyle),
-    html.P(
-        "For total fatalities we can see that the pattern does not follow the same trend. "
-        "There can be several causes for this, but we expect these factors, to at least contribute: ",
+    html.P([
+        "For total fatalities we can see that the pattern does ",
+        html.B("not"),
+        " follow the same trend. ",
+        "There can be several causes for this, but we expect these factors, to at least contribute: "],
         style=textStyle),
     dbc.ListGroup(
         [
