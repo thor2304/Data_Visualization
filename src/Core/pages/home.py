@@ -58,7 +58,7 @@ layout = html.Div([
         html.P(children=["The report can be downloaded ",
                          html.A("here", href="/static/group-11-report-DV.pdf", download="group-11-report-DV.pdf")]),
 
-    ], style={'width': '60%', "text-align": "center"}),
+    ], style={'width': '40%', "text-align": "center"}),
 ],
     style={'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'},
 )
