@@ -101,11 +101,11 @@ layout = html.Div([
                     ),
                     className="py-2",
                 ),
-            CheckList("Choose states", checklist_id='state-line-chart-state-selection', options=["Arizona"], only_select_first=True),
+            CheckList("Choose states", checklist_id='state-line-chart-state-selection', options=["Arizona"]),
         ],
         graph=dcc.Graph(id='state-line-chart', style=graphStyle),
         right_of_graph=[dbc.Form([
-            CheckList("Choose States", checklist_id='state-line-chart-state-selection2', options=["Arizona"], only_select_first=True),
+            CheckList("Choose States", checklist_id='state-line-chart-state-selection2', options=[]),
         ])]
     )
 ], style=pageStyle)
@@ -113,6 +113,9 @@ layout = html.Div([
 def get_states_based_on_event_type(event_type):
     mask = df['Event Type Group'] == event_type
     active_rows = df[mask]
+    # Remove Unknown state
+    active_rows = active_rows[active_rows['State'] != 'Unknown']
+
     # Sort and return states found
     states = active_rows['State'].unique()
     states.sort()
