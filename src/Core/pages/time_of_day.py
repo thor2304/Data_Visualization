@@ -41,7 +41,7 @@ layout = html.Div([
     ),
     html.P(["The following graph shows the ", html.B("Total Injuries", id="event-type-indicator-text"),
             ", for each event type group. ",
-            "This can be changed using the dropdown on the left.",
+            "This can be changed using the dropdown on the left. ",
             "The data is summed up from the years 2014-2022"],
            style=textStyle),
     GraphDiv(
