@@ -62,7 +62,7 @@ layout = html.Div([
     # PIE CHART #####################################################################
     html.H3(children="Amount of events in the period 2014-2022", style=textTitleStyle),
     html.P(children="The amount of events in the period 2014-2022, is shown through a doughnut chart. "
-                    "The doughnut chart aims at visualizing the amount of events for each event type."
+                    "The doughnut chart aims at visualizing the amount of events for each event type. "
                     "This should result in a clear overview of the amount of events for each event type. ",
            style=textStyle),
     html.P(children="From the doughnut chart it is clear that collisions and assaults are the most common event types. "
