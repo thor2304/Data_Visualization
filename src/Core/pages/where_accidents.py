@@ -8,7 +8,7 @@ import dash_bootstrap_components as dbc
 
 from src.Core.CustomComponents import GraphDiv, CheckList
 from src.Core.data_provider import get_df, get_category_orders
-from src.Core.styles import graphStyle, dropdownStyle, legendColors
+from src.Core.styles import graphStyle, dropdownStyle, legendColors, textStyle, textTitleStyle
 
 dash.register_page(__name__, name="Where do accidents happen?")
 
@@ -27,7 +27,18 @@ colorSteps = [0.01, 0.1, 0.3]
 
 layout = html.Div([
     html.H1('Do certain types of accidents occur more often in certain environments?',
-            style={'textAlign': 'center'}),
+            style={'textAlign': 'center', 'padding-bottom': 40, 'padding-top': 50}),
+    html.P(children="To find out if certain types of accidents happen more often in certain environments or states. "
+                    "We have chosen to create a Hexbin Mapbox for creating a map that is divided into hexagons and colored by the number of accidents in the area of the hexagon. ",
+           style=textStyle),
+    html.P(children="When trying to visualize the data, we found that the data was too large to be visualized in a scatter plot. Furthermore, when using a scatter plot, it was hard to see the areas with the most accidents. Therefore, we chose to use a Hexbin Mapbox. "
+                    "Furthermore, it is easier to see the areas with the most accidents, and it is easier to see the areas with the least accidents. This is because the hexagons are colored by the number of accidents in the area of the hexagon. The darker the hexagon, the more accidents in the area. ",
+           style=textStyle),
+
+    html.H3(children="Amount of accidents in relation to the area", style=textTitleStyle),
+    html.P(children="From the MapBox, it is clear that around the large cities there are many accidents. For example, the hexagons around New York and Washington are dark purple which indicates the highest number of accidents compared to the size of the area."
+           "However, in the area around Las Vegas and Phoenix, there are not many accidents compared to the size of the area. This is indicated by the light orange color of the hexagons. ",
+           style=textStyle),
     GraphDiv(
         left_of_graph=[
             dbc.Form([
