@@ -170,8 +170,15 @@ def update_event_graph(value: list[str], value2: str) -> Figure:
         color="Event Type Group",
         labels=labels,
         category_orders=get_category_orders(),
-        color_discrete_sequence=legendColors
+        color_discrete_sequence=legendColors,
     )
+
+    fig.add_annotation(x=2020, y=0.5,
+                       yref="paper",
+                       text="Covid 19 lockdown in 2020",
+                       bgcolor="rgba(255, 255, 255, 0.8)",
+                       showarrow=False,
+                       arrowhead=1)
 
     if value2 == "Normalise data":
         fig.update_yaxes(ticksuffix="%")
@@ -186,6 +193,8 @@ def update_event_graph(value: list[str], value2: str) -> Figure:
         hovertemplate='<b>%{data.name}:</b> %{y}<br>' +
                       '<extra></extra>',
     )
+
+    fig.update_xaxes(dtick=1)
 
     fig.update_layout(
         hoverlabel=labelStyle,
