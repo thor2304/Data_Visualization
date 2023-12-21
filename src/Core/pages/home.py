@@ -10,7 +10,7 @@ import dash_bootstrap_components as dbc
 from src.Core.styles import graphStyle, dropdownStyle
 from src.Core.data_provider import get_df
 
-dash.register_page(__name__, path='/', name="Introduction")
+dash.register_page(__name__, path='/', name="Introduction", order=0)
 
 us = united_states.UnitedStates()
 
@@ -58,7 +58,7 @@ layout = html.Div([
         html.P(children=["The report can be downloaded ",
                          html.A("here", href="/static/group-11-report-DV.pdf", download="group-11-report-DV.pdf")]),
 
-    ], style={'width': '60%', "text-align": "center"}),
+    ], style={'width': '40%', "text-align": "center"}),
 ],
     style={'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'},
 )
