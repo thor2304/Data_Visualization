@@ -58,6 +58,11 @@ layout = html.Div([
     ),
     html.H1('How does this change over the course of a year?',
             style={'textAlign': 'center', 'width': '60%'}),
+    html.P("We assumed that since the days get shorter in the winter, "
+           "we might see less spread in the hours that accidents happen. "
+           "What we see in the animation, "
+           "is that we cannot really draw such conclusions based on the data that we have collected. "
+           , style=textStyle),
     html.P(["The following graph shows the summation of the  ",
             html.B("number of accidents", id="animated-event-type-indicator-text"),
             " per hour, one month at a time, for each event type group.",

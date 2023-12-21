@@ -50,6 +50,14 @@ layout = html.Div([
                     "there are not many accidents compared to the size of the area. "
                     "This is indicated by the light orange color of the hexagons. ",
            style=textStyle),
+    html.P(children="Turning the number of hexbins up to 1000, "
+                    "reveals some interesting details about the underlying data. "
+                    "For instance, we dont have a single recorded incident in the entire state of "
+                    "South Dakota or Wyoming. "
+                    "It is unlikely that these states have gone entirely without accidents for 7 years. "
+                    "A possible explanation for this is that the data comes from only public transit, and these states "
+                    "have a very low population density. So the transit options might be limited. ",
+           style=textStyle),
     GraphDiv(
         left_of_graph=[
             dbc.Form([
