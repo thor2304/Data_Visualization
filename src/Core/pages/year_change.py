@@ -7,7 +7,7 @@ import plotly.express as px
 from dash import html, dcc, callback, Output, Input
 from plotly.graph_objs import Figure
 
-from src.Core.CustomComponents import GraphDiv
+from src.Core.CustomComponents import GraphDiv, CheckList
 from src.Core.data_provider import get_df, get_category_orders
 from src.Core.styles import graphStyle, pageStyle, graphDivStyle, textStyle, textTitleStyle, labelStyle, \
     legendColors
@@ -81,17 +81,9 @@ layout = html.Div([
                     "Normalising the data means that the different Event Types are indexed to the first year. ",
            style=textStyle),
     GraphDiv(
-        left_of_graph=[dbc.Form([
-                html.H3(children="Choose event types", style={'textAlign': 'center'}),
-                html.Div(
-                    dbc.Checklist(
-                        options=eventsList,
-                        value=eventsList,
-                        switch=True,
-                        id="event-checklist",
-                    ),
-                    className="py-2",
-                ),
+        left_of_graph=[
+            CheckList(title="Choose event types", options=eventsList, checklist_id="event-checklist"),
+            dbc.Form([
                 html.H3(children="Choose whether to normalise data",
                         style={'textAlign': 'center', 'padding-top': 20}),
                 html.P(children="Relative to the accidents in 2014"),
@@ -140,14 +132,13 @@ layout = html.Div([
 ], style=pageStyle)
 
 
-
 # EVENT GRAPH #################################################################
 @callback(
     Output('event-graph', 'figure'),
     Input('event-checklist', 'value'),
     Input('event-normaliser', 'value')
 )
-def update_event_graph(value: str, value2: str) -> Figure:
+def update_event_graph(value: list[str], value2: str) -> Figure:
     labels = {
         "Year": "Years",
         "Amount of Events": "Amount of events",
