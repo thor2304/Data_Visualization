@@ -82,7 +82,8 @@ layout = html.Div([
             ], id="color-bar", style={"width": "fit-content"})
         ]
     ),
-    html.H3(children="Percentage of accidents per state", style=textTitleStyle),
+    html.H3(["Percentage of ", html.B("Accident type", id="accident-type-indicator-text"), " per state"],
+            style=textTitleStyle),
     html.P(children="To show the percentage of accidents per state, we chose to create a colored bar chart. "
                     "You can chose to see the percentage of the different types of accidents, "
                     "in the left side of the screen. ",
@@ -240,3 +241,11 @@ def update_bar(bar_event_type: str) -> Figure:
     fig.update_yaxes(ticksuffix="%")
 
     return fig
+
+
+@callback(
+    Output('accident-type-indicator-text', 'children'),
+    Input('bar_event_type', 'value'),
+)
+def update_accident_type_text(y_selection: str) -> str:
+    return y_selection
