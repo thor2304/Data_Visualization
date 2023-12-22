@@ -131,7 +131,8 @@ def main():
 
     # Drop rows where Year is 2023
     df = df[df['Year'] != 2023]
-    df = df[df['Event Type Group'] != "Non-RGX Collision"]
+    df.loc[df["Event Type Group"] == "Non-RGX Collision", "Event Type Group"] = "Collision"
+    # df = df[df['Event Type Group'] != "Non-RGX Collision"]
 
     df = add_month_column(df)
     df = add_state_column(df)
