@@ -63,5 +63,8 @@ layout = html.Div([
                      html.A("here", href="/static/group-11-report-DV.pdf", download="group-11-report-DV.pdf"),
                      " and from the button at the right of the navigation bar."],
            style=textStyle),
+    html.P(children=["The code for the dashboard can be seen on our GitHub at: ",
+                     html.A("thor2304/Data_Visualization", href="https://github.com/thor2304/Data_Visualization", )],
+           style=textStyle),
 
 ], style=pageStyle)
