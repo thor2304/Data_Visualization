@@ -62,7 +62,7 @@ layout = html.Div([
     #                 "that is divided into hexagons and colored by the number of accidents in the area of the hexagon. ",
     #        style=textStyle),
 
-    html.H3(children="Amount of accidents in relation to the area", style=textTitleStyle),
+    html.H3(children="Where on the map does the most accidents happen?", style=textTitleStyle),
     html.P(children="From the Map below, it is clear that around the large cities there are many accidents. "
                     "For example, the hexagons around New York and Washington are purple, "
                     "which indicates the highest number of accidents. "
@@ -74,13 +74,17 @@ layout = html.Div([
                     "since the difference between the number of accidents in the "
                     "largest cities far exceeds that of the more sparsely populated ares.",
            style=textStyle),
-    html.P(children="Turning the number of hexbins up to 1000, "
-                    "reveals some interesting details about the underlying data. "
-                    "For instance, we dont have a single recorded incident in the entire state of "
-                    "South Dakota or Wyoming. "
-                    "It is unlikely that these states have gone entirely without accidents for 7 years. "
-                    "A possible explanation for this is that the data comes from only public transit, and these states "
-                    "have a very low population density. So the transit options might be limited. ",
+    html.P(children=["Turning the number of hexbins up to ",
+                     dbc.Button(
+                         "1000", outline=True, color="secondary", size="sm", id="hexagon-size-button"
+                     ),
+                     ", ",
+                     "reveals some interesting details about the underlying data. "
+                     "For instance, we dont have a single recorded incident in the entire state of "
+                     "South Dakota or Wyoming. "
+                     "It is unlikely that these states have gone entirely without accidents for 7 years. "
+                     "A possible explanation for this is that the data comes from only public transit, and these states "
+                     "have a very low population density. So the transit options might be limited. "],
            style=textStyle),
     GraphDiv(
         left_of_graph=[
@@ -114,9 +118,9 @@ layout = html.Div([
             ], id="color-bar", style={"width": "fit-content"})
         ]
     ),
-    html.H3(["Percentage of ",
+    html.H3(["In which states does ",
              html.B("Accident type", id="accident-type-indicator-text"),
-             " events per state"],
+             " make up the largest portion of events in the state?"],
             style=textTitleStyle),
     html.P(children=["We wanted to see if different states had a different makeup of accidents compared to each other. "
                      "Below we have calculated how much each Event Type makes up,"
@@ -151,7 +155,7 @@ layout = html.Div([
         graph=dcc.Graph(id='top10-bar', style=graphStyle)),
 
     # HORIZONTAL BAR GRAPH #########################################################
-    html.H3(children="Horizontal bar graph", style=textTitleStyle),
+    html.H3(children="What states have reported the most accidents, per capita?", style=textTitleStyle),
     html.P(
         children="Up to now, we have seen that the amount of events per year varies a lot between the different event types. "
                  "Generally, collisions and assaults are the most common event types, while the other event types are less common. "
@@ -219,7 +223,15 @@ def discrete_colorscale(breakpoints=None, discrete=True):
     return out
 
 
-collision_clicks = 0
+@callback(
+    Output('hexagon-size', 'value'),
+    Input('hexagon-size-button', 'n_clicks'),
+    Input('hexagon-size', 'value')
+)
+def update_hexbin_to_large(n_clicks: int, existing_value: int):
+    if n_clicks is None:
+        return existing_value
+    return 1000
 
 
 @callback(
