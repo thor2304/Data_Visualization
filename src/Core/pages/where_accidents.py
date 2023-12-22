@@ -225,24 +225,26 @@ def discrete_colorscale(breakpoints=None, discrete=True):
 
 @callback(
     Output('hexagon-size', 'value'),
+    Output('hexagon-size-button', 'n_clicks'),
     Input('hexagon-size-button', 'n_clicks'),
     Input('hexagon-size', 'value')
 )
-def update_hexbin_to_large(n_clicks: int, existing_value: int):
-    if n_clicks is None:
-        return existing_value
-    return 1000
+def update_hexbin_to_large(n_clicks: int, existing_value: int)-> tuple[int, int]:
+    if n_clicks is None or n_clicks == 0:
+        return existing_value, 0
+    return 1000, 0
 
 
 @callback(
     Output('bar_event_type', 'value'),
+    Output('collisions-button', 'n_clicks'),
     Input('collisions-button', 'n_clicks'),
     Input('bar_event_type', 'value')
 )
-def update_to_collisions(n_clicks: int, existing_value: str):
-    if n_clicks is None:
-        return existing_value
-    return "Collision"
+def update_to_collisions(n_clicks: int, existing_value: str)-> tuple[str, int]:
+    if n_clicks is None or n_clicks == 0:
+        return existing_value, 0
+    return "Collision", 0
 
 
 @callback(

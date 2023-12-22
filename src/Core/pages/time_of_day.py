@@ -117,13 +117,14 @@ def update_event_type_text(y_selection: str) -> str:
 
 @callback(
     Output('type-dropdown-selection', 'value'),
+    Output('total-fatalities-button', 'n_clicks'),
     Input('total-fatalities-button', 'n_clicks'),
     Input('type-dropdown-selection', 'value')
 )
-def update_chart_to_fatalities(n_clicks: int, existing_value: str) -> str:
-    if n_clicks is None:
-        return existing_value
-    return "Total Fatalities"
+def update_chart_to_fatalities(n_clicks: int, existing_value: str) -> tuple[str, int]:
+    if n_clicks is None or n_clicks == 0:
+        return existing_value, 0
+    return "Total Fatalities", 0
 
 
 @callback(
