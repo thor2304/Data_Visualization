@@ -119,7 +119,8 @@ layout = html.Div([
                     "in the left side of the screen. ",
            style=textStyle),
     html.P(children="The bar chart represents the percentage of accidents per state, "
-                    "and is colored based on the selected accident type. "),
+                    "and is colored based on the selected accident type. ",
+           style=textStyle),
     html.P(children="We wanted to see if different states had a different makeup of accidents compared to each other. "
            "Below we have calculated how much each Event Type makes up,"
            " out of the total events that happened in the state. "
@@ -127,7 +128,8 @@ layout = html.Div([
            "We can see that 4 states, have only reported collisions and no other event types for all 7 years. "
            "This provides further insight to the data, "
            "since it is unlikely that these states have only had collisions. "
-           "This is most likely caused by the reporting agencies from these states, only reporting collisions."),
+           "This is most likely caused by the reporting agencies from these states, only reporting collisions.",
+           style=textStyle),
     GraphDiv(
         left_of_graph=[
             html.H3(children="Choose event type", style={'textAlign': 'center', 'padding-top': 20}),
