@@ -1,9 +1,6 @@
-import trace
-
 import dash
-import numpy as np
-import pandas as pd
 import dash_bootstrap_components as dbc
+import numpy as np
 import plotly.express as px
 from dash import html, dcc, callback, Output, Input
 from plotly.graph_objs import Figure

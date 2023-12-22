@@ -1,6 +1,6 @@
 import dash
-from dash import Dash, html, dcc, callback, Output, Input
 import dash_bootstrap_components as dbc
+from dash import Dash, html
 
 app = Dash(__name__, use_pages=True, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
@@ -12,7 +12,7 @@ navbarChildren = [
 ]
 navbarChildren.append(dbc.NavItem(
     dbc.Button(
-        "Download Report",
+        "Download Report📄",
         href="/static/group-11-report-DV.pdf",
         download="group-11-report-DV.pdf",
         external_link=True,
@@ -25,6 +25,8 @@ navbar = dbc.NavbarSimple(
     brand_href="/",
     color="dark",
     dark=True,
+    fluid=True,
+    expand="lg",
 )
 
 app.layout = html.Div([

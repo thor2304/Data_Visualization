@@ -1,14 +1,10 @@
 import dash
-from dash import Dash, html, dcc, callback, Output, Input
-import plotly.express as px
-import pandas as pd
-from plotly.graph_objs import Figure
-import numpy as np
-import united_states
 import dash_bootstrap_components as dbc
+import united_states
+from dash import html
 
-from src.Core.styles import graphStyle, dropdownStyle, headerStyle, textTitleStyle, pageStyle, textStyle
 from src.Core.data_provider import get_df
+from src.Core.styles import headerStyle, textTitleStyle, pageStyle, textStyle
 
 dash.register_page(__name__, path='/', name="Introduction", order=0)
 
@@ -33,7 +29,8 @@ layout = html.Div([
                     "illustrate/find different relations between Major Security and Safety Events in transportation"
                     " in the United States of America between 2014 and 2022, which is our dataset.", style=textStyle),
     html.P(children=["The dataset can be found at: ",
-                     html.A("data.gov", href="https://catalog.data.gov/dataset/major-safety-events", )],
+                     html.A("data.gov", href="https://catalog.data.gov/dataset/major-safety-events",
+                            target="_blank")],
            style=textStyle),
     html.P("The dataset is collected from incidents involving public transportation in some way. "
            "This could be that one part of a collision was a bus, or that a train conductor was attacked. "
@@ -60,11 +57,13 @@ layout = html.Div([
         style={"width": "fit-content", "margin": "auto"},
     ),
     html.P(children=["The report can be downloaded ",
-                     html.A("here", href="/static/group-11-report-DV.pdf", download="group-11-report-DV.pdf"),
+                     html.A("here", href="/static/group-11-report-DV.pdf", download="group-11-report-DV.pdf",
+                            target="_blank"),
                      " and from the button at the right of the navigation bar."],
            style=textStyle),
     html.P(children=["The code for the dashboard can be seen on our GitHub at: ",
-                     html.A("thor2304/Data_Visualization", href="https://github.com/thor2304/Data_Visualization", )],
+                     html.A("thor2304/Data_Visualization", href="https://github.com/thor2304/Data_Visualization",
+                            target="_blank")],
            style=textStyle),
 
 ], style=pageStyle)

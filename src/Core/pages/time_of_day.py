@@ -1,13 +1,12 @@
 import dash
-from dash import Dash, html, dcc, callback, Output, Input
-from plotly.graph_objs import Figure
-import plotly.express as px
-import numpy as np
 import dash_bootstrap_components as dbc
+import plotly.express as px
+from dash import html, dcc, callback, Output, Input
+from plotly.graph_objs import Figure
 
 from src.Core.CustomComponents import GraphDiv, CheckList
 from src.Core.data_provider import get_df, get_category_orders, get_reverse_category_orders
-from src.Core.styles import graphDivStyle, pageStyle, graphStyle, legendColors, headerStyle, textStyle
+from src.Core.styles import pageStyle, graphStyle, legendColors, headerStyle, textStyle
 
 dash.register_page(__name__, name="2. When does injuries happen?", order=2)
 

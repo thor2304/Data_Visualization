@@ -1,7 +1,7 @@
-from dash import html, dcc, callback, Output, Input
 import dash_bootstrap_components as dbc
+from dash import html, dcc
 
-from src.Core.styles import graphDivStyle, graphStyle
+from src.Core.styles import graphDivStyle
 
 
 def GraphDiv(left_of_graph: list = None, graph: dcc.Graph | html.Div = None, right_of_graph: list = None) -> html.Div:
