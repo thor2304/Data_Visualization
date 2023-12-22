@@ -120,7 +120,7 @@ def update_event_type_text(y_selection: str) -> str:
     Input('total-fatalities-button', 'n_clicks'),
     Input('type-dropdown-selection', 'value')
 )
-def update_hexbin_to_large(n_clicks: int, existing_value: str) -> str:
+def update_chart_to_fatalities(n_clicks: int, existing_value: str) -> str:
     if n_clicks is None:
         return existing_value
     return "Total Fatalities"
