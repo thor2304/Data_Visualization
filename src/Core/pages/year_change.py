@@ -36,7 +36,7 @@ layout = html.Div([
            style=textStyle),
 
     # PIE CHART #####################################################################
-    html.H3(children="Distribution of events in the period 2014-2022", style=textTitleStyle),
+    html.H3(children="What is the distribution of events in the period 2014-2022?", style=textTitleStyle),
     # html.P(children="The amount of events in the period 2014-2022, is shown in the doughnut chart below. "
     #                 "The doughnut chart aims at visualizing the amount of events for each event type. "
     #                 "This should result in a clear overview of the amount of events for each event type. ",
@@ -52,7 +52,7 @@ layout = html.Div([
     GraphDiv(graph=dcc.Graph(id='bar-event-graph', style=graphStyle)),
 
     # EVENT GRAPH ###################################################################
-    html.H3(children="Event frequency over the years", style=textTitleStyle),
+    html.H3(children="How does the event frequency change over the years?", style=textTitleStyle),
     html.P(
         children="To visualize the evolution of the amount of different accidents per year, line graphs were created. "
                  "The line graphs show the amount of events per year for each event type. "
@@ -88,7 +88,7 @@ layout = html.Div([
         style=textStyle),
 
     # LINE CHART WITH STATES #########################################################
-    html.H3(children="Event frequency per state", style=textTitleStyle),
+    html.H3(children="How does the Event frequency change per state?", style=textTitleStyle),
     html.P(
         children="The chart above shows a slight increase of events over the years. "
                  "However, when looking at the situation in the different states, "

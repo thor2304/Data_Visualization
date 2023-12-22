@@ -27,7 +27,9 @@ layout = html.Div([
            "It is worth noting that the drop in the middle of the day for injuries is not as pronounced as expected.",
            style=textStyle),
     html.P([
-        "For total fatalities we can see that the pattern does ",
+        "For ", dbc.Button(
+            "Total Fatalities", outline=True, color="secondary", size="sm", id="total-fatalities-button"
+        ), " we can see that the pattern does ",
         html.B("not"),
         " follow the same trend. ",
         "There can be several causes for this, but we expect these factors, to at least contribute: "],
@@ -58,7 +60,7 @@ layout = html.Div([
         ],
         graph=dcc.Graph(id='time-graph', style=graphStyle),
     ),
-    html.H1('How does this change over the course of a year?',
+    html.H3('How does this change over the course of a year?',
             style={'textAlign': 'center', 'width': '60%'}),
     html.P("We assumed that since the days get shorter in the winter, "
            "we might see less spread in the hours that accidents happen. "
@@ -111,6 +113,17 @@ def time_of_day(y_selection: str, selected_event_types: list[str]) -> Figure:
 )
 def update_event_type_text(y_selection: str) -> str:
     return y_selection
+
+
+@callback(
+    Output('type-dropdown-selection', 'value'),
+    Input('total-fatalities-button', 'n_clicks'),
+    Input('type-dropdown-selection', 'value')
+)
+def update_hexbin_to_large(n_clicks: int, existing_value: str) -> str:
+    if n_clicks is None:
+        return existing_value
+    return "Total Fatalities"
 
 
 @callback(
