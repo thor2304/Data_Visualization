@@ -82,7 +82,7 @@ layout = html.Div([
                      "reveals some interesting details about the underlying data. "
                      "For instance, we dont have a single recorded incident in the entire state of "
                      "South Dakota or Wyoming. "
-                     "It is unlikely that these states have gone entirely without accidents for 7 years. "
+                     "It is unlikely that these states have gone entirely without accidents for 9 years. "
                      "A possible explanation for this is that the data comes from only public transit, and these states "
                      "have a very low population density. So the transit options might be limited. "],
            style=textStyle),
@@ -129,7 +129,7 @@ layout = html.Div([
                      "We can see that 4 states, have only reported ",
                      dbc.Button(
                          "Collisions", outline=True, color="secondary", size="sm", id="collisions-button"
-                     ), " and no other event types for all 7 years. "
+                     ), " and no other event types for all 9 years. "
                         "This provides further insight to the data, "
                         "since it is unlikely that these states have only had collisions. "
                         "This is most likely caused by the reporting agencies from these states, "
