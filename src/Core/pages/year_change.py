@@ -1,5 +1,8 @@
+import trace
+
 import dash
 import numpy as np
+import pandas as pd
 import dash_bootstrap_components as dbc
 import plotly.express as px
 from dash import html, dcc, callback, Output, Input
@@ -7,7 +10,7 @@ from plotly.graph_objs import Figure
 
 from src.Core.CustomComponents import GraphDiv, CheckList
 from src.Core.data_provider import get_df, get_category_orders
-from src.Core.styles import graphStyle, pageStyle, textStyle, textTitleStyle, labelStyle, legendColors
+from src.Core.styles import graphStyle, pageStyle, textStyle, textTitleStyle, labelStyle, legendColors, headerStyle
 
 dash.register_page(__name__, name="1. Do more happen every year?", order=1)
 
@@ -22,31 +25,34 @@ statesList = np.delete(statesListRaw, np.where(statesListRaw == "Unknown"))
 
 layout = html.Div([
     html.H1(children="Is there an increase or decrease in certain types of accidents in the last 9 years?",
-            style={'textAlign': 'center', 'padding-bottom': 20, 'padding-top': 50, 'width': '40%'}),
+            style=headerStyle),
     html.P(children="To answer this question, the page contains three different graphs. "
-                    "The first graph is a doughnut chart, which shows the amount of events in the period 2014-2022. "
+                    "The first graph is a doughnut chart, "
+                    "which shows the distribution of events in the period 2014-2022. "
                     "The second graph is a line graph, which shows the amount of events per year for each event type. "
                     "This graph highlights the evolution of the different event types over the years. "
-                    "The third graph is as well a line chart. However, this line chart builds upon the second graph, "
+                    "The third graph is a line chart that builds upon the second graph, "
                     "by showing the amount of events per state over the years. ",
            style=textStyle),
 
     # PIE CHART #####################################################################
-    html.H3(children="Amount of events in the period 2014-2022", style=textTitleStyle),
-    html.P(children="The amount of events in the period 2014-2022, is shown through a doughnut chart. "
-                    "The doughnut chart aims at visualizing the amount of events for each event type."
-                    "This should result in a clear overview of the amount of events for each event type. ",
-           style=textStyle),
-    html.P(children="From the doughnut chart it is clear that collisions and assaults are the most common event types. "
-                    "The other event types are rare compared to collisions and assaults. "
-                    "The event types Security and Other may not be as clear as the other event types in the context of what they include. "
+    html.H3(children="What is the distribution of events in the period 2014-2022?", style=textTitleStyle),
+    # html.P(children="The amount of events in the period 2014-2022, is shown in the doughnut chart below. "
+    #                 "The doughnut chart aims at visualizing the amount of events for each event type. "
+    #                 "This should result in a clear overview of the amount of events for each event type. ",
+    #        style=textStyle),
+    html.P(children="From the chart below it is clear that Collisions and Assaults are the most common event types. "
+                    "The other event types are rare compared to Collisions and Assaults. "
+                    "For the event types: Security and Other it may not be as clear what events they include. "
                     "The event type Security includes events such as bomb threats, hijackings and random gun fire. "
-                    "The event type Other includes events such as people falling, people getting sick and people getting lost. ",
+                    "The event type Other, includes events such as people falling, "
+                    "people getting sick and people getting lost. "
+                    "However we will see later that some counties, may use the Other category more than others.",
            style=textStyle),
     GraphDiv(graph=dcc.Graph(id='bar-event-graph', style=graphStyle)),
 
     # EVENT GRAPH ###################################################################
-    html.H3(children="Events per year", style=textTitleStyle),
+    html.H3(children="How does the event frequency change over the years?", style=textTitleStyle),
     html.P(
         children="To visualize the evolution of the amount of different accidents per year, line graphs were created. "
                  "The line graphs show the amount of events per year for each event type. "
@@ -62,7 +68,7 @@ layout = html.Div([
             dbc.Form([
                 html.H3(children="Choose whether to normalise data",
                         style={'textAlign': 'center', 'padding-top': 20}),
-                html.P(children="Relative to the accidents in 2014"),
+                html.P(children="Relative to the number of accidents in 2014"),
                 html.Div(
                     dbc.RadioItems(
                         options=["Don't normalise data", "Normalise data", ],
@@ -82,10 +88,12 @@ layout = html.Div([
         style=textStyle),
 
     # LINE CHART WITH STATES #########################################################
-    html.H3(children="Events per state", style=textTitleStyle),
+    html.H3(children="How does the Event frequency change per state?", style=textTitleStyle),
     html.P(
-        children="To explore the development in the different states, the following graph shows the amount of events per year for each state. "
-                 "The graph can be modified to show specific states and event types. ",
+        children="The chart above shows a slight increase of events over the years. "
+                 "However, when looking at the situation in the different states, "
+                 "it is clear that the change in events varies a lot between the different states. "
+                 "In the graph below, states can be chosen, and their change can be seen, for one event type at a time.",
         style=textStyle),
     GraphDiv(
         left_of_graph=[
@@ -94,13 +102,13 @@ layout = html.Div([
                          style={'width': '100%', 'justify-content': 'end', 'margin-bottom': '2em'}, clearable=False),
             html.H3(children="Choose whether to normalise data", style={'textAlign': 'center'}),
             html.Div(
-                    dbc.RadioItems(
-                        options=["Don't normalise data", "Normalise data", ],
-                        value="Don't normalise data",
-                        id='state-line-chart-normaliser',
-                    ),
-                    className="py-2",
+                dbc.RadioItems(
+                    options=["Don't normalise data", "Normalise data", ],
+                    value="Don't normalise data",
+                    id='state-line-chart-normaliser',
                 ),
+                className="py-2",
+            ),
             CheckList("Choose states", checklist_id='state-line-chart-state-selection', options=["Arizona"]),
         ],
         graph=dcc.Graph(id='state-line-chart', style=graphStyle),
@@ -109,6 +117,7 @@ layout = html.Div([
         ])]
     )
 ], style=pageStyle)
+
 
 def get_states_based_on_event_type(event_type):
     mask = df['Event Type Group'] == event_type
@@ -121,13 +130,15 @@ def get_states_based_on_event_type(event_type):
     states.sort()
     return states
 
+
 @callback(
     Output('state-line-chart-state-selection', 'options'),
     Output('state-line-chart-state-selection2', 'options'),
     Input('state-line-chart-event-selection', 'value'),
 )
 def update_state_line_chart_checklist(value: str):
-    return get_states_based_on_event_type(value)[:17], get_states_based_on_event_type(value)[17:]
+    cutoff = 13
+    return get_states_based_on_event_type(value)[:cutoff], get_states_based_on_event_type(value)[cutoff:]
 
 
 # EVENT GRAPH #################################################################

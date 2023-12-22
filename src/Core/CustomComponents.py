@@ -10,7 +10,7 @@ def GraphDiv(left_of_graph: list = None, graph: dcc.Graph | html.Div = None, rig
     if right_of_graph is None:
         right_of_graph = html.P("")
 
-    side_style = {'width': '60%', 'margin': 'auto', 'height': '100%', "padding-top": "4em"}
+    side_style = {'width': '60%', 'margin': 'auto', 'height': '100%', "padding-top": "3em"}
     return html.Div([
         html.Div(left_of_graph, style=side_style),
         graph,

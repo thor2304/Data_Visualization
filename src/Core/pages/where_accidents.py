@@ -10,6 +10,7 @@ import pandas as pd
 from src.Core.CustomComponents import GraphDiv, CheckList
 from src.Core.data_provider import get_df, get_category_orders
 from src.Core.styles import graphStyle, dropdownStyle, legendColors, textTitleStyle, textStyle
+from src.Core.styles import graphStyle, dropdownStyle, legendColors, textStyle, textTitleStyle, headerStyle
 
 dash.register_page(__name__, name="3. Where do accidents happen?", order=3)
 
@@ -55,28 +56,35 @@ colorSteps = [0.01, 0.1, 0.3]
 
 layout = html.Div([
     html.H1('Do certain types of accidents occur more often in certain environments?',
-            style={'textAlign': 'center', 'padding-bottom': 40, 'padding-top': 50}),
-    html.P(children="To find out if certain types of accidents happen more often in certain environments or states. "
-                    "We have chosen to create a Hexbin Mapbox for creating a map, "
-                    "that is divided into hexagons and colored by the number of accidents in the area of the hexagon. ",
-           style=textStyle),
-    html.P(children="When trying to visualize the data, "
-                    "we found that the data was too large to be visualized in a scatter plot. "
-                    "Furthermore, when using a scatter plot, it was hard to see the areas with the most accidents. "
-                    "Therefore, we chose to use a Hexbin Mapbox. "
-                    "Furthermore, it is easier to see the areas with the most accidents, "
-                    "and it is easier to see the areas with the least accidents. "
-                    "This is because the hexagons are colored by the number of accidents in the area of the hexagon. "
-                    "The darker the hexagon, the more accidents in the area. ",
-           style=textStyle),
+            style=headerStyle),
+    # html.P(children="To find out if certain types of accidents happen more often in certain environments or states. "
+    #                 "I was chosen to create a Hexbin Mapbox for creating a map, "
+    #                 "that is divided into hexagons and colored by the number of accidents in the area of the hexagon. ",
+    #        style=textStyle),
 
-    html.H3(children="Amount of accidents in relation to the area", style=textTitleStyle),
-    html.P(children="From the MapBox, it is clear that around the large cities there are many accidents. "
-                    "For example, the hexagons around New York and Washington are dark purple, "
-                    "which indicates the highest number of accidents compared to the size of the area."
-                    "However, in the area around Las Vegas and Phoenix, "
-                    "there are not many accidents compared to the size of the area. "
-                    "This is indicated by the light orange color of the hexagons. ",
+    html.H3(children="Where on the map does the most accidents happen?", style=textTitleStyle),
+    html.P(children="From the Map below, it is clear that around the large cities there are many accidents. "
+                    "For example, the hexagons around New York and Washington are purple, "
+                    "which indicates the highest number of accidents. "
+                    "The orange hexagons around Las Vegas and Phoenix,"
+                    "indicate that there are fewer accidents in these areas. ",
+           style=textStyle),
+    html.P(children="The colorscale for this chart is a binned colorscale, as can be seen on the right. "
+                    "The bins are not evenly distributed, "
+                    "since the difference between the number of accidents in the "
+                    "largest cities far exceeds that of the more sparsely populated ares.",
+           style=textStyle),
+    html.P(children=["Turning the number of hexbins up to ",
+                     dbc.Button(
+                         "1000", outline=True, color="secondary", size="sm", id="hexagon-size-button"
+                     ),
+                     ", ",
+                     "reveals some interesting details about the underlying data. "
+                     "For instance, we dont have a single recorded incident in the entire state of "
+                     "South Dakota or Wyoming. "
+                     "It is unlikely that these states have gone entirely without accidents for 9 years. "
+                     "A possible explanation for this is that the data comes from only public transit, and these states "
+                     "have a very low population density. So the transit options might be limited. "],
            style=textStyle),
     GraphDiv(
         left_of_graph=[
@@ -110,13 +118,27 @@ layout = html.Div([
             ], id="color-bar", style={"width": "fit-content"})
         ]
     ),
-    html.H3(children="Percentage of accidents per state", style=textTitleStyle),
-    html.P(children="To show the percentage of accidents per state, we chose to create a colored bar chart. "
-                    "You can chose to see the percentage of the different types of accidents, "
-                    "in the left side of the screen. ",
+    html.H3(["In which states does ",
+             html.B("Accident type", id="accident-type-indicator-text"),
+             " make up the largest portion of events in the state?"],
+            style=textTitleStyle),
+    html.P(children=["We wanted to see if different states had a different makeup of accidents compared to each other. "
+                     "Below we have calculated how much each Event Type makes up,"
+                     " out of the total events that happened in the state. "
+                     "The 10 states that have the highest percentage for the chosen event type are shown in the chart. ",
+                     "We can see that 4 states, have only reported ",
+                     dbc.Button(
+                         "Collisions", outline=True, color="secondary", size="sm", id="collisions-button"
+                     ), " and no other event types for all 9 years. "
+                        "This provides further insight to the data, "
+                        "since it is unlikely that these states have only had collisions. "
+                        "This is most likely caused by the reporting agencies from these states, "
+                        "only reporting collisions."],
            style=textStyle),
     html.P(children="The bar chart represents the percentage of accidents per state, "
-                    "and is colored based on the selected accident type. ",
+                    "and is colored based on the selected accident type. "
+                    "You can chose the event type by clicking the radio buttons "
+                    "in the left side of the screen. ",
            style=textStyle),
     GraphDiv(
         left_of_graph=[
@@ -133,7 +155,7 @@ layout = html.Div([
         graph=dcc.Graph(id='top10-bar', style=graphStyle)),
 
     # HORIZONTAL BAR GRAPH #########################################################
-    html.H3(children="Horizontal bar graph", style=textTitleStyle),
+    html.H3(children="What states have reported the most accidents, per capita?", style=textTitleStyle),
     html.P(
         children="Up to now, we have seen that the amount of events per year varies a lot between the different event types. "
                  "Generally, collisions and assaults are the most common event types, while the other event types are less common. "
@@ -199,6 +221,28 @@ def discrete_colorscale(breakpoints=None, discrete=True):
     out.append([1, colorBarColors[-1]])
 
     return out
+
+
+@callback(
+    Output('hexagon-size', 'value'),
+    Input('hexagon-size-button', 'n_clicks'),
+    Input('hexagon-size', 'value')
+)
+def update_hexbin_to_large(n_clicks: int, existing_value: int):
+    if n_clicks is None:
+        return existing_value
+    return 1000
+
+
+@callback(
+    Output('bar_event_type', 'value'),
+    Input('collisions-button', 'n_clicks'),
+    Input('bar_event_type', 'value')
+)
+def update_to_collisions(n_clicks: int, existing_value: str):
+    if n_clicks is None:
+        return existing_value
+    return "Collision"
 
 
 @callback(
@@ -299,6 +343,14 @@ def update_bar(bar_event_type: str) -> Figure:
     fig.update_yaxes(ticksuffix="%")
 
     return fig
+
+
+@callback(
+    Output('accident-type-indicator-text', 'children'),
+    Input('bar_event_type', 'value'),
+)
+def update_accident_type_text(y_selection: str) -> str:
+    return y_selection
 
 
 # Horizontal bar graph #########################################################
