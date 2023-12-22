@@ -9,7 +9,7 @@ import pandas as pd
 
 from src.Core.CustomComponents import GraphDiv, CheckList
 from src.Core.data_provider import get_df, get_category_orders
-from src.Core.styles import graphStyle, dropdownStyle, legendColors, textTitleStyle, textStyle
+from src.Core.styles import graphStyle, dropdownStyle, legendColors, textTitleStyle, textStyle, labelStyle
 from src.Core.styles import graphStyle, dropdownStyle, legendColors, textStyle, textTitleStyle, headerStyle
 
 dash.register_page(__name__, name="3. Where do accidents happen?", order=3)
@@ -308,6 +308,15 @@ def update_map(value: int, event_type: str) -> Figure:
         # range_color=[0, 200],
     )
 
+    fig.update_traces(
+        hovertemplate='<b>%{z}</b> accidents in the area' +
+                      '<extra></extra>',
+    )
+
+    fig.update_layout(
+        hoverlabel=labelStyle,
+    )
+
     return fig
 
 
@@ -343,6 +352,16 @@ def update_bar(bar_event_type: str) -> Figure:
                  )
 
     fig.update_yaxes(ticksuffix="%")
+
+    # Hover settings for the graph
+    fig.update_traces(
+        hovertemplate='<b>%{data.name}</b> represents <b>%{y:.2f}%</b> of all the accidents in the state <b>%{x}</b>' +
+                      '<extra></extra>',
+    )
+
+    fig.update_layout(
+        hoverlabel=labelStyle,
+    )
 
     return fig
 
@@ -401,7 +420,7 @@ def update_horizontal_bar_graph(value) -> Figure:
     # Hover settings for the graph
     fig.update_traces(
         hovertemplate='<b>%{data.name}</b><br>' +
-                      '<b>Event Per Mil Citizens: %{x:.2f}</b><br>' +
+                      '<b>Event Per Mil Citizens:</b> %{x:.2f}<br>' +
                       '<extra></extra>',
     )
 

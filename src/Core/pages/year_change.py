@@ -285,6 +285,13 @@ def update_state_line_chart(event_type: str, states_selected1, states_selected2,
         markers=True,
     )
 
+    fig.add_annotation(x=2020, y=0.5,
+                       yref="paper",
+                       text="Covid 19 lockdown in 2020",
+                       bgcolor="rgba(255, 255, 255, 0.8)",
+                       showarrow=False,
+                       arrowhead=1)
+
     if normalise == "Normalise data":
         fig.update_yaxes(ticksuffix="%")
     else:
