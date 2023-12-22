@@ -57,18 +57,22 @@ colorSteps = [0.01, 0.1, 0.3]
 layout = html.Div([
     html.H1('Do certain types of accidents occur more often in certain environments?',
             style=headerStyle),
-    html.P(children="To find out if certain types of accidents happen more often in certain environments or states. "
-                    "I was chosen to create a Hexbin Mapbox for creating a map, "
-                    "that is divided into hexagons and colored by the number of accidents in the area of the hexagon. ",
-           style=textStyle),
+    # html.P(children="To find out if certain types of accidents happen more often in certain environments or states. "
+    #                 "I was chosen to create a Hexbin Mapbox for creating a map, "
+    #                 "that is divided into hexagons and colored by the number of accidents in the area of the hexagon. ",
+    #        style=textStyle),
 
     html.H3(children="Amount of accidents in relation to the area", style=textTitleStyle),
-    html.P(children="From the MapBox, it is clear that around the large cities there are many accidents. "
-                    "For example, the hexagons around New York and Washington are dark purple, "
-                    "which indicates the highest number of accidents compared to the size of the area. "
-                    "However, in the area around Las Vegas and Phoenix, "
-                    "there are not many accidents compared to the size of the area. "
-                    "This is indicated by the light orange color of the hexagons. ",
+    html.P(children="From the Map below, it is clear that around the large cities there are many accidents. "
+                    "For example, the hexagons around New York and Washington are purple, "
+                    "which indicates the highest number of accidents. "
+                    "The orange hexagons around Las Vegas and Phoenix,"
+                    "indicate that there are fewer accidents in these areas. ",
+           style=textStyle),
+    html.P(children="The colorscale for this chart is a binned colorscale, as can be seen on the right. "
+                    "The bins are not evenly distributed, "
+                    "since the difference between the number of accidents in the "
+                    "largest cities far exceeds that of the more sparsely populated ares.",
            style=textStyle),
     html.P(children="Turning the number of hexbins up to 1000, "
                     "reveals some interesting details about the underlying data. "
@@ -114,21 +118,23 @@ layout = html.Div([
              html.B("Accident type", id="accident-type-indicator-text"),
              " events per state"],
             style=textTitleStyle),
-    html.P(children="To show the percentage of accidents per state, a colored bar chart was created. "
-                    "You can chose to see the percentage of the different types of accidents, "
-                    "in the left side of the screen. ",
+    html.P(children=["We wanted to see if different states had a different makeup of accidents compared to each other. "
+                     "Below we have calculated how much each Event Type makes up,"
+                     " out of the total events that happened in the state. "
+                     "The 10 states that have the highest percentage for the chosen event type are shown in the chart. ",
+                     "We can see that 4 states, have only reported ",
+                     dbc.Button(
+                         "Collisions", outline=True, color="secondary", size="sm", id="collisions-button"
+                     ), " and no other event types for all 7 years. "
+                        "This provides further insight to the data, "
+                        "since it is unlikely that these states have only had collisions. "
+                        "This is most likely caused by the reporting agencies from these states, "
+                        "only reporting collisions."],
            style=textStyle),
     html.P(children="The bar chart represents the percentage of accidents per state, "
-                    "and is colored based on the selected accident type. ",
-           style=textStyle),
-    html.P(children="We wanted to see if different states had a different makeup of accidents compared to each other. "
-           "Below we have calculated how much each Event Type makes up,"
-           " out of the total events that happened in the state. "
-           "The 10 states that have the highest percentage for the chosen event type are shown in the chart. "
-           "We can see that 4 states, have only reported collisions and no other event types for all 7 years. "
-           "This provides further insight to the data, "
-           "since it is unlikely that these states have only had collisions. "
-           "This is most likely caused by the reporting agencies from these states, only reporting collisions.",
+                    "and is colored based on the selected accident type. "
+                    "You can chose the event type by clicking the radio buttons "
+                    "in the left side of the screen. ",
            style=textStyle),
     GraphDiv(
         left_of_graph=[
@@ -211,6 +217,20 @@ def discrete_colorscale(breakpoints=None, discrete=True):
     out.append([1, colorBarColors[-1]])
 
     return out
+
+
+collision_clicks = 0
+
+
+@callback(
+    Output('bar_event_type', 'value'),
+    Input('collisions-button', 'n_clicks'),
+    Input('bar_event_type', 'value')
+)
+def update_to_collisions(n_clicks: int, existing_value: str):
+    if n_clicks is None:
+        return existing_value
+    return "Collision"
 
 
 @callback(
