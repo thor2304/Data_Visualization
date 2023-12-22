@@ -118,9 +118,9 @@ layout = html.Div([
             ], id="color-bar", style={"width": "fit-content"})
         ]
     ),
-    html.H3(["In which states does ",
+    html.H3(["Which states have the highest relative share of ",
              html.B("Accident type", id="accident-type-indicator-text"),
-             " make up the largest portion of events in the state?"],
+             " events?"],
             style=textTitleStyle),
     html.P(children=["We wanted to see if different states had a different makeup of accidents compared to each other. "
                      "Below we have calculated how much each Event Type makes up,"
